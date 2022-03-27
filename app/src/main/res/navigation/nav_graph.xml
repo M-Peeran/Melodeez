@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.peeranm.melodeez.feature_music_playback.presentation.PlayerFragment"
+        android:label="PlayerFragment"
+        tools:layout="@layout/player_fragment" />
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.peeranm.melodeez.common.presentation.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/activity_main">
+        <action
+            android:id="@+id/action_mainFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_albumDetailsFragment"
+            app:destination="@id/albumDetailsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_artistDetailsFragment"
+            app:destination="@id/artistDetailsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_addTracksFragment"
+            app:destination="@id/addTracksFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_playlistDetailsFragment"
+            app:destination="@id/playlistDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/albumDetailsFragment"
+        android:name="com.peeranm.melodeez.feature_tracks_by_album.presentation.details.AlbumDetailsFragment"
+        android:label="AlbumDetailsFragment"
+        tools:layout="@layout/album_details_fragment" >
+        <argument
+            android:name="albumKey"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_albumDetailsFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+        <action
+            android:id="@+id/action_albumDetailsFragment_to_artistDetailsFragment"
+            app:destination="@id/artistDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/artistDetailsFragment"
+        android:name="com.peeranm.melodeez.feature_tracks_by_artist.presentation.details.ArtistDetailsFragment"
+        android:label="artist_details_fragment"
+        tools:layout="@layout/artist_details_fragment" >
+        <action
+            android:id="@+id/action_artistDetailsFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+        <argument
+            android:name="artistKey"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_artistDetailsFragment_to_albumDetailsFragment"
+            app:destination="@id/albumDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addTracksFragment"
+        android:name="com.peeranm.melodeez.feature_playlist.presentation.add_track.AddTracksFragment"
+        android:label="add_tracks_fragment"
+        tools:layout="@layout/add_tracks_fragment" >
+        <argument
+            android:name="playlistKey"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/playlistDetailsFragment"
+        android:name="com.peeranm.melodeez.feature_playlist.presentation.details.PlaylistDetailsFragment"
+        android:label="playlist_details_fragment"
+        tools:layout="@layout/playlist_details_fragment" >
+        <argument
+            android:name="playlistKey"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_playlistDetailsFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+        <action
+            android:id="@+id/action_playlistDetailsFragment_to_addTracksFragment"
+            app:destination="@id/addTracksFragment" />
+        <action
+            android:id="@+id/action_playlistDetailsFragment_to_albumDetailsFragment"
+            app:destination="@id/albumDetailsFragment" />
+        <action
+            android:id="@+id/action_playlistDetailsFragment_to_artistDetailsFragment"
+            app:destination="@id/artistDetailsFragment" />
+    </fragment>
+</navigation>

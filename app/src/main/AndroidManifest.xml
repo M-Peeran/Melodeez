@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.peeranm.melodeez">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        android:name="com.peeranm.melodeez.common.di.MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Melodeez">
+        <activity
+            android:name=".common.presentation.MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name="com.peeranm.melodeez.feature_music_playback.utils.PlaybackService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+        <receiver android:name=".common.utils.ButtonReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ACTION_PLAY" />
+                <action android:name="ACTION_PAUSE" />
+                <action android:name="ACTION_PLAY_NEXT" />
+                <action android:name="ACTION_PLAY_PREVIOUS" />
+                <action android:name="ACTION_STOP" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="6dp"
+    android:elevation="0dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageview_albumart"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:contentDescription="@string/album_art"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_music" />
+
+        <TextView
+            android:id="@+id/textview_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:hint="Track title"
+            android:maxLines="1"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/textview_artist_and_album"
+            app:layout_constraintEnd_toStartOf="@+id/imageview_options"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/imageview_albumart"
+            app:layout_constraintTop_toTopOf="@+id/imageview_albumart" />
+
+        <TextView
+            android:id="@+id/textview_artist_and_album"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:hint="Artist name"
+            android:maxLines="1"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageview_albumart"
+            app:layout_constraintEnd_toStartOf="@+id/imageview_options"
+            app:layout_constraintStart_toEndOf="@+id/imageview_albumart"
+            app:layout_constraintTop_toBottomOf="@+id/textview_title" />
+
+        <ImageView
+            android:id="@+id/imageview_options"
+            android:layout_width="25dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/options"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_track_options" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
