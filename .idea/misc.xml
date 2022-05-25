@@ -3,10 +3,34 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/add_tracks_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/album_details_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/albums_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/albums_list_item.xml" value="0.6" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/all_tracks_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/artist_details_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/artist_list_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/artists_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/create_new_playlist_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/create_playlist_dialog.xml" value="0.25416666666666665" />
         <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/main_fragment.xml" value="0.25416666666666665" />
-        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/tracks_list_item.xml" value="0.25416666666666665" />
-        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/tracks_list_item_simple.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/mini_player.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/now_playing_dialog.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/now_playing_list_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/player_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/playlist_details_dialog.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/playlist_details_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/playlist_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/playlists_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/select_playlist_dialog.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/select_playlist_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/simple_track_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/track_details_dialog.xml" value="0.7054429028815368" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/tracks_list_item.xml" value="0.536" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/tracks_list_item_simple.xml" value="0.4" />
         <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/tracks_list_selectable_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/layout/view_pager_host_fragment.xml" value="0.264" />
+        <entry key="..\:/Projects/Melodeez/app/src/main/res/menu/menu_playlist_options.xml" value="0.11302083333333333" />
       </map>
     </option>
   </component>

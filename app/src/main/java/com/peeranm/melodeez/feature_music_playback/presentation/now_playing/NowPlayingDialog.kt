@@ -5,30 +5,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.peeranm.melodeez.common.utils.BaseAdapter
-import com.peeranm.melodeez.common.utils.BaseHolder
-import com.peeranm.melodeez.common.utils.KIND_NOW_PLAYING
-import com.peeranm.melodeez.common.utils.MEDIA_POSITION
-import com.peeranm.melodeez.feature_tracks.model.Track
+import com.peeranm.melodeez.R
+import com.peeranm.melodeez.core.utils.KIND_NOW_PLAYING
+import com.peeranm.melodeez.core.utils.MEDIA_POSITION
 import com.peeranm.melodeez.databinding.NowPlayingDialogBinding
-import com.peeranm.melodeez.databinding.NowPlayingListItemBinding
+import com.peeranm.melodeez.feature_music_playback.data.device_storage.SourceAction
+import com.peeranm.melodeez.feature_music_playback.model.Track
+import com.peeranm.melodeez.feature_music_playback.utils.adapters.NowPlayingAdapter
+import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
+import com.peeranm.melodeez.feature_music_playback.utils.collectWithLifecycle
+import com.peeranm.melodeez.feature_music_playback.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class NowPlayingDialog : BottomSheetDialogFragment() {
+class NowPlayingDialog : BottomSheetDialogFragment(),OnItemClickListener<Track> {
 
     private val viewModel: NowPlayingViewModel by viewModels()
 
     private var _binding: NowPlayingDialogBinding? = null
     private val binding: NowPlayingDialogBinding
     get() = _binding!!
+
+    private var adapter: NowPlayingAdapter? = null
 
     private val controls: MediaController.TransportControls
     get() = requireActivity().mediaController.transportControls
@@ -49,65 +51,51 @@ class NowPlayingDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val diffCallback = object : DiffUtil.ItemCallback<Track>() {
-            override fun areItemsTheSame(oldItem: Track, newItem: Track): Boolean {
-                return oldItem == newItem
-            }
+        adapter = NowPlayingAdapter(requireContext(), this)
+        binding.listNowPlaying.adapter = adapter
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.listNowPlaying.layoutManager = layoutManager
+        binding.listNowPlaying.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
 
-            override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
-                return oldItem.uri == newItem.uri &&
-                        oldItem.title == newItem.title &&
-                        oldItem.album == newItem.album &&
-                        oldItem.artist == newItem.artist &&
-                        oldItem.duration == newItem.duration
+        collectWithLifecycle(viewModel.sourceAction) { sourceAction ->
+            when (sourceAction) {
+                SourceAction.PlayFromBeginning -> {
+                    val keyBundle = Bundle()
+                    keyBundle.putInt(MEDIA_POSITION, 0)
+                    controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
+                }
+                SourceAction.Stop -> controls.stop()
+                else -> Unit
             }
         }
 
-        val adapter = object : BaseAdapter<Track>(diffCallback) {
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-                return object : BaseHolder<NowPlayingListItemBinding>(
-                    NowPlayingListItemBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        false
-                    )
-                ) {
-                    override fun onInitializeViewHolder(rootView: View) {
-                        rootView.setOnClickListener {
-                            val keyBundle = Bundle()
-                            keyBundle.putInt(MEDIA_POSITION, adapterPosition)
-                            controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
-                        }
-                        binding.imageviewClear.setOnClickListener {
-                            viewModel.removeFromQueueAt(adapterPosition)
-                            notifyItemRemoved(adapterPosition)
-                            if (viewModel.getSource().isEmpty()) {
-                                dismiss()
-                                findNavController().navigateUp()
-                            }
-                        }
-                    }
-                }
-            }
-            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-                holder as BaseHolder<NowPlayingListItemBinding>
-                val track = getItem(position)
-                holder.binding.apply {
-                    textviewTitle.text = track.title
-                    textviewArtistAndAlbum.text = "${track.artist} - ${track.album}"
-                }
-            }
+        collectWithLifecycle(viewModel.currentSource) { source ->
+            if (source.isEmpty()) {
+                requireContext().showToast("No tracks in queue")
+            } else adapter?.submitData(source)
         }
-        binding.recyclerviewNowPlaying.adapter = adapter
 
-        if (viewModel.getSource().isEmpty()) {
-            Toast.makeText(requireContext(), "No tracks in queue", Toast.LENGTH_SHORT).show()
-        } else adapter.submitList(viewModel.getSource())
+        viewModel.onEvent(Event.GetCurrentSource)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onItemClick(view: View?, data: Track, position: Int) {
+        when (view?.id) {
+            R.id.btnClear -> {
+                viewModel.onEvent(Event.RemoveTrackFromQueue(position))
+                adapter?.notifyItemRemoved(position)
+            }
+            else -> {
+                val keyBundle = Bundle()
+                keyBundle.putInt(MEDIA_POSITION, position)
+                controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapter?.onClear()
+        adapter = null
         _binding = null
     }
-
 }

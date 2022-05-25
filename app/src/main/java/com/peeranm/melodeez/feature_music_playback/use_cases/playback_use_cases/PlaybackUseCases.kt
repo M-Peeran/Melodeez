@@ -6,5 +6,7 @@ data class PlaybackUseCases(
     val resumePlayback: ResumePlaybackUseCase,
     val stopPlayback: StopPlaybackUseCase,
     val seekToPosition: SeekToPositionUseCase,
-    val releasePlayer: ReleasePlayerUseCase
+    val releasePlayer: ReleasePlayerUseCase,
+    val toggleRepeatState: ToggleRepeatStateUseCase,
+    val getRepeatState: GetRepeatStateUseCase
 )

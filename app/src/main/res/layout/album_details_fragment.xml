@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".feature_tracks_by_album.presentation.details.AlbumDetailsFragment">
+    tools:context=".feature_music_playback.presentation.tracks_by_album.details.AlbumDetailsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -23,7 +23,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/imageview_detail_art"
+                    android:id="@+id/imageAlbumArt"
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_marginStart="16dp"
@@ -31,7 +31,7 @@
                     android:layout_marginBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintDimensionRatio="w,1:1"
-                    app:layout_constraintEnd_toStartOf="@+id/textview_detail_title"
+                    app:layout_constraintEnd_toStartOf="@+id/textAlbumName"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
                     tools:src="@drawable/ic_music" />
 
                 <TextView
-                    android:id="@+id/textview_detail_title"
+                    android:id="@+id/textAlbumName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
@@ -49,15 +49,15 @@
                     android:maxLines="1"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toTopOf="@+id/textview_detail_release_year"
+                    app:layout_constraintBottom_toTopOf="@+id/textReleaseYear"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/imageview_detail_art"
-                    app:layout_constraintTop_toTopOf="@+id/imageview_detail_art"
+                    app:layout_constraintStart_toEndOf="@+id/imageAlbumArt"
+                    app:layout_constraintTop_toTopOf="@+id/imageAlbumArt"
                     app:layout_constraintVertical_chainStyle="packed" />
 
                 <TextView
-                    android:id="@+id/textview_detail_release_year"
+                    android:id="@+id/textReleaseYear"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -67,13 +67,13 @@
                     android:hint="Release year"
                     android:maxLines="1"
                     android:textSize="12sp"
-                    app:layout_constraintBottom_toTopOf="@+id/textview_no_of_tracks"
+                    app:layout_constraintBottom_toTopOf="@+id/textNoOfTracks"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageview_detail_art"
-                    app:layout_constraintTop_toBottomOf="@+id/textview_detail_title" />
+                    app:layout_constraintStart_toEndOf="@+id/imageAlbumArt"
+                    app:layout_constraintTop_toBottomOf="@+id/textAlbumName" />
 
                 <TextView
-                    android:id="@+id/textview_no_of_tracks"
+                    android:id="@+id/textNoOfTracks"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -82,10 +82,10 @@
                     android:hint="No of tracks"
                     android:maxLines="1"
                     android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/imageview_detail_art"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageAlbumArt"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageview_detail_art"
-                    app:layout_constraintTop_toBottomOf="@+id/textview_detail_release_year" />
+                    app:layout_constraintStart_toEndOf="@+id/imageAlbumArt"
+                    app:layout_constraintTop_toBottomOf="@+id/textReleaseYear" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline2"
@@ -97,7 +97,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar_album_details"
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
@@ -109,11 +109,10 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_album_tracks"
+        android:id="@+id/listTracksInAlbum"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="4dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

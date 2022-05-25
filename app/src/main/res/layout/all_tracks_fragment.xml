@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".feature_tracks.presentation.AllTracksFragment">
+    tools:context=".feature_music_playback.presentation.all_tracks.AllTracksFragment">
 
     <ProgressBar
         android:id="@+id/progressbar"
@@ -15,10 +15,9 @@
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_tracks"
+        android:id="@+id/listTracks"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+        android:layout_height="match_parent" >
 
     </androidx.recyclerview.widget.RecyclerView>
 

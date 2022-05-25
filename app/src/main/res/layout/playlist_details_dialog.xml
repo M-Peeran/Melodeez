@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".feature_tracks.presentation.details.TrackDetailsDialog">
+    tools:context=".feature_music_playback.presentation.all_tracks.details.TrackDetailsDialog">
 
     <ImageView
         android:id="@+id/imageView6"
@@ -13,13 +13,13 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_album_copy"
-        app:layout_constraintEnd_toStartOf="@+id/textview_playlist_track_detail_album"
+        app:layout_constraintEnd_toStartOf="@+id/textAlbum"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textview_playlist_track_detail_album"
+        android:id="@+id/textAlbum"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -41,13 +41,13 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_artist_copy"
-        app:layout_constraintEnd_toStartOf="@+id/textview_playlist_track_detail_artist"
+        app:layout_constraintEnd_toStartOf="@+id/textArtist"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView6" />
 
     <TextView
-        android:id="@+id/textview_playlist_track_detail_artist"
+        android:id="@+id/textArtist"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -69,13 +69,13 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_delete"
-        app:layout_constraintEnd_toStartOf="@+id/textview_delete_from_playlist"
+        app:layout_constraintEnd_toStartOf="@+id/textDeleteFromPlaylist"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView9" />
 
     <TextView
-        android:id="@+id/textview_delete_from_playlist"
+        android:id="@+id/textDeleteFromPlaylist"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -99,13 +99,13 @@
         android:layout_marginBottom="16dp"
         android:src="@drawable/ic_add_to_queue"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textview_Playlist_track_add_to_queue"
+        app:layout_constraintEnd_toStartOf="@+id/textAddToQueue"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView10" />
 
     <TextView
-        android:id="@+id/textview_Playlist_track_add_to_queue"
+        android:id="@+id/textAddToQueue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

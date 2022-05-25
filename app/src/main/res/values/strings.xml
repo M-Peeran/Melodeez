@@ -2,4 +2,8 @@
     <string name="app_name">Melodeez</string>
     <string name="album_art">Abum art</string>
     <string name="options">Options</string>
+    <string name="track_artist_and_album">%1$s - %2$s</string>
+    <string name="no_of_tracks">Tracks : %1$s</string>
+    <string name="release_year">Release Year : %1$s</string>
+    <string name="start_time">00:00</string>
 </resources>

@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name="com.peeranm.melodeez.common.di.MyApplication"
+        android:name="com.peeranm.melodeez.core.di.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Melodeez">
         <activity
-            android:name=".common.presentation.MainActivity"
+            android:name=".feature_music_playback.presentation.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:launchMode="singleTop">
@@ -29,7 +29,7 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
-        <receiver android:name=".common.utils.ButtonReceiver"
+        <receiver android:name=".feature_music_playback.utils.ButtonReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_PLAY" />
