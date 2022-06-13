@@ -27,7 +27,7 @@ class PlaylistAdapter(
     private val data = AsyncListDiffer(this,
         object : DiffUtil.ItemCallback<Any>() {
             override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-                return oldItem.toString() == newItem.toString()
+                return oldItem.toString() === newItem.toString()
             }
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {

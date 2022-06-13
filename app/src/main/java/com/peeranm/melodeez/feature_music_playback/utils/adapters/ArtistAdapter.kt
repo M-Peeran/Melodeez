@@ -18,7 +18,7 @@ class ArtistAdapter(
     private val differ = AsyncListDiffer(this,
         object : DiffUtil.ItemCallback<Artist>() {
             override fun areItemsTheSame(oldItem: Artist, newItem: Artist): Boolean {
-                return oldItem.name == newItem.name
+                return oldItem.name === newItem.name
             }
             override fun areContentsTheSame(oldItem: Artist, newItem: Artist): Boolean {
                 return oldItem == newItem
