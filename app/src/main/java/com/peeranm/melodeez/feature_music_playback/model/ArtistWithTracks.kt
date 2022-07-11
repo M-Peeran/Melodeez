@@ -6,6 +6,6 @@ import androidx.room.Relation
 data class ArtistWithTracks(
     @Embedded
     val artist: Artist,
-    @Relation(parentColumn = "artistId", entityColumn = "trackId")
+    @Relation(parentColumn = "name", entityColumn = "artist")
     val tracks: List<Track>
 )
