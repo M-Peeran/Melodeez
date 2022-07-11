@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
+import com.peeranm.melodeez.feature_music_playback.data.device_storage.AlbumsSource
 import com.peeranm.melodeez.feature_music_playback.data.device_storage.TracksSource
 import com.peeranm.melodeez.feature_music_playback.data.local.MusicDatabase
 import com.peeranm.melodeez.feature_music_playback.use_cases.media_player_use_cases.*
@@ -204,7 +205,7 @@ object AppModule {
         database: MusicDatabase
     ): AlbumUseCases {
         val albumRepository = AlbumRepositoryImpl(database.albumDao(),)
-        val getAlbumsFromStorage = GetAlbumsFromStorageUseCase(context)
+        val getAlbumsFromStorage = GetAlbumsFromStorageUseCase(context, AlbumsSource())
         val getAlbumsFromCache = GetAlbumsFromCacheUseCase(albumRepository)
         val getAlbumsForUi = GetAlbumsFromCacheForUiUseCase(albumRepository)
         val getAlbumWithTracks = GetAlbumWithTracksUseCase(albumRepository)
