@@ -16,24 +16,16 @@ val tabArray = arrayOf(
 fun getTimeStamp(milliSec: Long): String {
     val min = (milliSec / 1000) / 60
     val sec = (milliSec / 1000) % 60
-    return when {
-        min < 10 -> if (sec < 10) "0$min:0$sec" else "0$min:$sec"
-        sec < 10 -> "$min:0$sec"
-        else -> "$min:$sec"
+    return buildString {
+        append(if (min < 10) "0$min" else min)
+        append(':')
+        append(if (sec < 10) "0$sec" else sec)
     }
 }
 
 fun Context.getBitmap(directory: File = this.filesDir, bitmapName: String): Bitmap {
     val artFile = File(directory, "$bitmapName.png")
     return BitmapFactory.decodeStream(FileInputStream(artFile))
-}
-
-sealed class DataState<out R> {
-    data class Success<out T>(val data: T) : DataState<T>()
-    data class Failure(val message: String) : DataState<Nothing>()
-    object Loading : DataState<Nothing>()
-    object Synchronizing : DataState<Nothing>()
-    object SynchronizationCompleted : DataState<Nothing>()
 }
 
 sealed class RepeatState {
