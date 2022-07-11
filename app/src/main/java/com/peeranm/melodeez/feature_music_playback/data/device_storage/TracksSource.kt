@@ -24,8 +24,9 @@ class TracksSource {
         var artist: String
         var album: String
         var duration: Long
-        var isAlbumArtAvailable: Boolean
         var id: Long
+        var isAlbumArtAvailable: Boolean
+        var embeddedArt: ByteArray?
 
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
@@ -66,18 +67,17 @@ class TracksSource {
 
                 if (!File(directory, "$album.png").exists()) {
                     val mmr = MediaMetadataRetriever()
-                    var embeddedArt: ByteArray?
                     try {
                         mmr.setDataSource(context, uri)
                         embeddedArt = mmr.embeddedPicture
                     } catch (e: Exception) { continue }
-                    isAlbumArtAvailable = if (embeddedArt != null) {
+                    isAlbumArtAvailable = embeddedArt != null
+                    if (isAlbumArtAvailable) {
                         val artFile = File(directory, "$album.png")
                         val outStream = FileOutputStream(artFile)
                         outStream.write(embeddedArt)
                         outStream.close()
-                        true
-                    } else false
+                    }
                     mmr.release()
                 } else isAlbumArtAvailable = true
 
