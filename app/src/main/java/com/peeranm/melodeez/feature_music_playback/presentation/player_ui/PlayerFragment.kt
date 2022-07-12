@@ -80,15 +80,15 @@ class PlayerFragment : Fragment() {
             if (shouldShowMessage) {
                 when(repeatState) {
                     is RepeatState.RepeatOff -> {
-                        requireContext().showToast("Repeat Off")
+                        showToast("Repeat Off")
                         setProperStateImage()
                     }
                     is RepeatState.RepeatAll -> {
-                        requireContext().showToast("Repeat All")
+                        showToast("Repeat All")
                         setProperStateImage()
                     }
                     is RepeatState.RepeatOne -> {
-                        requireContext().showToast("Repeat Single")
+                        showToast("Repeat Single")
                         setProperStateImage()
                     }
                     else -> Unit

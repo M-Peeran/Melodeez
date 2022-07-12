@@ -35,9 +35,9 @@ class TrackDetailsDialog(private val track: Track) : DialogFragment() {
         collectWithLifecycle(viewModel.isSuccessful) { isSuccessful ->
             isSuccessful?.let {
                 if (isSuccessful) {
-                    requireContext().showToast("Added to queue")
+                    showToast("Added to queue")
                 } else {
-                    requireContext().showToast("Failed : queue is empty")
+                    showToast("Failed : queue is empty")
                 }
             }
         }

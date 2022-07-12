@@ -81,7 +81,7 @@ class AllTracksFragment : Fragment(), OnItemClickListener<Track> {
                     viewModel.onEvent(Event.Synchronize)
                 } else {
                     binding.progressbar.visibility = View.GONE
-                    requireContext().showToast("Permission Denied")
+                    showToast("Permission Denied")
                     requireActivity().finish()
                 }
             }

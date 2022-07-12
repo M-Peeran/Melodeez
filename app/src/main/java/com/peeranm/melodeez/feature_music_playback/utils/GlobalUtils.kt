@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -52,8 +53,8 @@ fun Context.getImageRequest(albumArtRef: String, target: ImageView) : ImageReque
     }.build()
 }
 
-fun Context.showToast(message: String) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+fun Fragment.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(requireContext(), message, duration).show()
 }
 
 fun getReleaseYearString(releaseYear: Int): String {

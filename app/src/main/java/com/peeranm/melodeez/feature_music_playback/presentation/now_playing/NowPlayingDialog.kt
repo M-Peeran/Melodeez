@@ -71,7 +71,7 @@ class NowPlayingDialog : BottomSheetDialogFragment(),OnItemClickListener<Track> 
 
         collectWithLifecycle(viewModel.currentSource) { source ->
             if (source.isEmpty()) {
-                requireContext().showToast("No tracks in queue")
+                showToast("No tracks in queue")
             } else adapter?.submitData(source)
         }
 

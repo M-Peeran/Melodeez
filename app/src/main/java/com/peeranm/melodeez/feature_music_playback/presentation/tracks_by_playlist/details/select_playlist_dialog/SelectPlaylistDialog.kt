@@ -51,7 +51,7 @@ class SelectPlaylistDialog(private val track: Track) : DialogFragment(), OnCheck
             if (it != null) {
                 if (it.isEmpty()) {
                     dismiss()
-                    requireContext().showToast("No playlists available, create one!")
+                    showToast("No playlists available, create one!")
                 } else adapter?.submitData(it)
             }
         }
@@ -67,7 +67,7 @@ class SelectPlaylistDialog(private val track: Track) : DialogFragment(), OnCheck
         if (isSelected) {
             dismiss()
             viewModel.onEvent(Event.InsertTrackToPlaylist(data.playlistId, track.trackId))
-            requireContext().showToast("Added ${track.title} to ${data.name} successfully!")
+            showToast("Added ${track.title} to ${data.name} successfully!")
         }
     }
 

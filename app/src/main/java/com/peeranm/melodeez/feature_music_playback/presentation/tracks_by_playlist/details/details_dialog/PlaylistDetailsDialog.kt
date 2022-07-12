@@ -40,7 +40,7 @@ class PlaylistDetailsDialog(
             textDeleteFromPlaylist.setOnClickListener {
                 dismiss()
                 viewModel.onEvent(Event.DeleteTrackFromPlaylist(playlistId, track.trackId))
-                requireContext().showToast("Deleted successfully!")
+                showToast("Deleted successfully!")
             }
 
             textAddToQueue.setOnClickListener {
@@ -51,9 +51,9 @@ class PlaylistDetailsDialog(
             collectWithLifecycle(viewModel.isSuccessful) { isSuccessful ->
                 isSuccessful?.let {
                     if (it) {
-                        requireContext().showToast("Added to queue")
+                        showToast("Added to queue")
                     } else {
-                        requireContext().showToast("Failed : queue is empty")
+                        showToast("Failed : queue is empty")
                     }
                 }
             }

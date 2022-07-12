@@ -94,7 +94,7 @@ class PlaylistsFragment : Fragment(), OnItemClickListener<Any> {
                     }
                     R.id.actionDeletePlaylist -> {
                         viewModel.onEvent(Event.DeletePlaylist(data.playlistId))
-                        requireContext().showToast("Deleted ${data.name} successfully!")
+                        showToast("Deleted ${data.name} successfully!")
                     }
                 }
                 true

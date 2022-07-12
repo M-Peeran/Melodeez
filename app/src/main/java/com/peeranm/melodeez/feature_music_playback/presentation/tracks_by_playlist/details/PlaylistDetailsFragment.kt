@@ -87,7 +87,7 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
 
         collectWithLifecycle(viewModel.isDeletionSuccess) { isSuccess ->
             if (isSuccess != null && isSuccess) {
-                requireContext().showToast("Deleted successfully!")
+                showToast("Deleted successfully!")
                 findNavController().navigateUp()
             }
         }

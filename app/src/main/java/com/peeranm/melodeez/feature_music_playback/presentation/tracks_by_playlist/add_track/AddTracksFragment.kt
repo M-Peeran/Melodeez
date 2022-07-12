@@ -66,7 +66,7 @@ class AddTracksFragment : Fragment(), OnCheckChangeListener<Track> {
 
             btnAddSelected.setOnClickListener {
                 viewModel.onEvent(Event.AddSelectedTracksToPlaylist(args.playlistId))
-                requireContext().showToast("Added successfully")
+                showToast("Added successfully")
                 findNavController().navigateUp()
             }
 
