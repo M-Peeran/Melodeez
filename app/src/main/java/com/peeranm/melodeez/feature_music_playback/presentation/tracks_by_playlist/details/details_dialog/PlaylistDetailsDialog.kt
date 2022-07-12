@@ -54,7 +54,7 @@ class PlaylistDetailsDialog(
     }
 
     private fun PlaylistDetailsDialogBinding.handleOnAddToQueueClick() {
-        textDeleteFromPlaylist.setOnClickListener {
+        textAddToQueue.setOnClickListener {
             viewModel.onEvent(Event.DeleteTrackFromPlaylist(playlistId, track.trackId))
             showToast("Deleted successfully!")
             dismiss()
@@ -62,7 +62,7 @@ class PlaylistDetailsDialog(
     }
 
     private fun PlaylistDetailsDialogBinding.handleOnDeleteFromPlaylistClick() {
-        textAddToQueue.setOnClickListener {
+        textDeleteFromPlaylist.setOnClickListener {
             viewModel.onEvent(Event.AddToQueue(track))
             dismiss()
         }
