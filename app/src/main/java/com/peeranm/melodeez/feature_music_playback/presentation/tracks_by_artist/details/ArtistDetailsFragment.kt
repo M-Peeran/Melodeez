@@ -15,7 +15,9 @@ import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.KIND_ARTIST
 import com.peeranm.melodeez.core.MEDIA_KEY
 import com.peeranm.melodeez.core.MEDIA_POSITION
+import com.peeranm.melodeez.core.collectWithLifecycle
 import com.peeranm.melodeez.databinding.ArtistDetailsFragmentBinding
+import com.peeranm.melodeez.feature_music_playback.model.Artist
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.all_tracks.details.TrackDetailsDialog
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
@@ -54,40 +56,18 @@ class ArtistDetailsFragment : Fragment(), OnItemClickListener<Track> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.setupToolbar()
+        binding.bindList()
 
-        lifecycleScope.launch {
-            adapter = SimpleTrackAdapter(requireContext(), this@ArtistDetailsFragment)
-            val artistId = args.artistId
-            val (artist, tracks) = viewModel.getArtistWithTracks(artistId)
-            binding.apply {
-                findNavController().let {
-                    (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-                    toolbar.setupWithNavController(
-                        it,
-                        AppBarConfiguration.Builder()
-                            .setFallbackOnNavigateUpListener {
-                                it.navigateUp()
-                                true
-                            }.build()
-                    )
-                }
-                toolbar.title = ""
-                listTracksOfArtist.adapter = adapter
-                textArtistName.text = artist.name
-                textNoOfTracks.text = String.format(getString(R.string.no_of_tracks), tracks.size)
-                adapter?.submitData(tracks)
-            }
+        collectWithLifecycle(viewModel.artistWithTracks) {
+            binding.bindArtistAndTracks(it.artist, it.tracks)
         }
+
     }
 
     override fun onItemClick(view: View?, data: Track, position: Int) {
         when (view?.id) {
-            R.id.btnOptions -> {
-                TrackDetailsDialog.getInstance(data)
-                    .show(
-                        childFragmentManager, "TRACK"
-                    )
-            }
+            R.id.btnOptions -> TrackDetailsDialog.getInstance(data).show(childFragmentManager, "TRACK")
             else -> {
                 val keyBundle = Bundle()
                 keyBundle.putInt(MEDIA_POSITION, position)
@@ -98,6 +78,31 @@ class ArtistDetailsFragment : Fragment(), OnItemClickListener<Track> {
                 )
             }
         }
+    }
+
+    private fun ArtistDetailsFragmentBinding.setupToolbar() {
+        findNavController().let { navController ->
+            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setupWithNavController(
+                navController,
+                AppBarConfiguration.Builder().setFallbackOnNavigateUpListener {
+                    navController.navigateUp()
+                    true
+                }.build()
+            )
+            toolbar.title = ""
+        }
+    }
+
+    private fun ArtistDetailsFragmentBinding.bindList() {
+        adapter = SimpleTrackAdapter(requireContext(), this@ArtistDetailsFragment)
+        listTracksOfArtist.adapter = adapter
+    }
+
+    private fun ArtistDetailsFragmentBinding.bindArtistAndTracks(artist: Artist, tracks: List<Track>) {
+        textArtistName.text = artist.name
+        textNoOfTracks.text = String.format(getString(R.string.no_of_tracks), tracks.size)
+        adapter?.submitData(tracks)
     }
 
     override fun onDestroyView() {
