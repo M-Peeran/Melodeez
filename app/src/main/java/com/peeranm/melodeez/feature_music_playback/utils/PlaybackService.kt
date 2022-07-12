@@ -22,9 +22,7 @@ import com.peeranm.melodeez.feature_music_playback.use_cases.album_use_cases.Alb
 import com.peeranm.melodeez.feature_music_playback.use_cases.artist_use_cases.ArtistUseCases
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -123,94 +121,82 @@ class PlaybackService : MediaBrowserServiceCompat(),
             trackInfo.updateState(playbackState)
             notificationHelper.unregisterReceiver()
             mediaSession.isActive = false
+            serviceScope.cancel()
             stopSelf()
         }
 
         override fun onSkipToNext() {
+            if(audioFocusHelper.requestAudioFocus() != AudioManager.AUDIOFOCUS_GAIN) return
+            serviceScope.launch {
+                val tracks = playbackSourceHelper.getCurrentSource()
+                val position = playbackSourceHelper.getCurrentTrackPosition()
 
-            when (audioFocusHelper.requestAudioFocus()) {
-                AudioManager.AUDIOFOCUS_GAIN -> {
-                    serviceScope.launch {
+                if (position+1 < tracks.size) {
+                    var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT).build()
+                    mediaSession.setPlaybackState(playbackState)
+                    trackInfo.updateState(playbackState)
 
-                        val tracks = getCurrentSource()
-                        val position = playbackSourceHelper.getCurrentTrackPosition()
+                    val track = tracks[position+1]
+                    val metadata = getMetadataBuilder(track).build()
+                    mediaSession.setMetadata(metadata)
+                    trackInfo.updateMetadata(metadata)
 
-                        if (position+1 < tracks.size) {
-                            var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT).build()
-                            mediaSession.setPlaybackState(playbackState)
-                            trackInfo.updateState(playbackState)
+                    playbackHelper.playTrack(track.uri.toUri())
+                    playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
+                    mediaSession.setPlaybackState(playbackState)
+                    trackInfo.updateState(playbackState)
 
-                            val track = tracks[position+1]
-                            val metadata = getMetadataBuilder(track).build()
-                            mediaSession.setMetadata(metadata)
-                            trackInfo.updateMetadata(metadata)
-
-                            playbackHelper.playTrack(track.uri.toUri())
-                            playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
-                            mediaSession.setPlaybackState(playbackState)
-                            trackInfo.updateState(playbackState)
-
-                            startService(Intent(baseContext, PlaybackService::class.java))
-                            startForeground(
-                                NOTIFICATION_ID,
-                                notificationHelper.getNotification(
-                                    mediaSession.controller.metadata,
-                                    mediaSession.sessionToken,
-                                    playbackHelper.isPlaying()
-                                )
-                            )
-
-                            playbackSourceHelper.setTrackPosition(position+1)
-                        }
-                    }
+                    startService(Intent(baseContext, PlaybackService::class.java))
+                    startForeground(
+                        NOTIFICATION_ID,
+                        notificationHelper.getNotification(
+                            mediaSession.controller.metadata,
+                            mediaSession.sessionToken,
+                            playbackHelper.isPlaying()
+                        )
+                    )
+                    playbackSourceHelper.setTrackPosition(position+1)
                 }
             }
         }
 
         override fun onSkipToPrevious() {
-            when (audioFocusHelper.requestAudioFocus()) {
-                AudioManager.AUDIOFOCUS_GAIN -> {
-                    serviceScope.launch {
+            if(audioFocusHelper.requestAudioFocus() != AudioManager.AUDIOFOCUS_GAIN) return
+            serviceScope.launch {
+                val tracks = playbackSourceHelper.getCurrentSource()
+                val position = playbackSourceHelper.getCurrentTrackPosition()
 
-                        val tracks = getCurrentSource()
-                        val position = playbackSourceHelper.getCurrentTrackPosition()
+                if (position-1 >= 0) {
+                    var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS).build()
+                    mediaSession.setPlaybackState(playbackState)
+                    trackInfo.updateState(playbackState)
 
-                        if (position-1 >= 0) {
-                            var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS).build()
-                            mediaSession.setPlaybackState(playbackState)
-                            trackInfo.updateState(playbackState)
+                    val track = tracks[position-1]
+                    val metadata = getMetadataBuilder(track).build()
+                    mediaSession.setMetadata(metadata)
+                    trackInfo.updateMetadata(metadata)
 
-                            val track = tracks[position-1]
-                            val metadata = getMetadataBuilder(track).build()
-                            mediaSession.setMetadata(metadata)
-                            trackInfo.updateMetadata(metadata)
+                    playbackHelper.playTrack(track.uri.toUri())
+                    playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
+                    mediaSession.setPlaybackState(playbackState)
+                    trackInfo.updateState(playbackState)
 
-                            playbackHelper.playTrack(track.uri.toUri())
-                            playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
-                            mediaSession.setPlaybackState(playbackState)
-                            trackInfo.updateState(playbackState)
-
-                            startService(Intent(baseContext, PlaybackService::class.java))
-                            startForeground(
-                                NOTIFICATION_ID,
-                                notificationHelper.getNotification(
-                                    mediaSession.controller.metadata,
-                                    mediaSession.sessionToken,
-                                    playbackHelper.isPlaying()
-                                )
-                            )
-
-                            playbackSourceHelper.setTrackPosition(position-1)
-                        }
-                    }
+                    startService(Intent(baseContext, PlaybackService::class.java))
+                    startForeground(
+                        NOTIFICATION_ID,
+                        notificationHelper.getNotification(
+                            mediaSession.controller.metadata,
+                            mediaSession.sessionToken,
+                            playbackHelper.isPlaying()
+                        )
+                    )
+                    playbackSourceHelper.setTrackPosition(position-1)
                 }
             }
         }
 
         override fun onSeekTo(pos: Long) {
-
             playbackHelper.seekToPosition(pos.toInt())
-
             if (playbackHelper.isPlaying()) {
                 val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
                 mediaSession.setPlaybackState(playbackState)
@@ -228,7 +214,6 @@ class PlaybackService : MediaBrowserServiceCompat(),
             AudioManager.AUDIOFOCUS_GAIN -> audioFocusHelper.duckRestore()
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> mediaSession.controller.transportControls.pause()
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> audioFocusHelper.duckNow()
-
             AudioManager.AUDIOFOCUS_LOSS -> {
                 mediaSession.controller.transportControls.stop()
                 audioFocusHelper.abandonAudioFocus()
@@ -242,7 +227,6 @@ class PlaybackService : MediaBrowserServiceCompat(),
             is RepeatState.RepeatOff -> {
                 val tracksSize = playbackSourceHelper.getCurrentSourceSize()
                 val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
-
                 if (currentTrackPosition+1 == tracksSize) {
                     Toast.makeText(baseContext, "Queue ended", Toast.LENGTH_SHORT).show()
                     val playbackState = getStateBuilder(PlaybackStateCompat.STATE_NONE).build()
@@ -250,17 +234,13 @@ class PlaybackService : MediaBrowserServiceCompat(),
                     trackInfo.updateState(playbackState)
                 } else mediaSession.controller.transportControls.skipToNext()
             }
-
             is RepeatState.RepeatAll -> {
                 val tracksSize = playbackSourceHelper.getCurrentSourceSize()
                 val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
-
                 if (currentTrackPosition+1 == tracksSize) {
                     val bundle = bundleOf(MEDIA_POSITION to 0)
                     mediaSession.controller.transportControls.playFromMediaId(KIND_NOW_PLAYING, bundle)
-                } else {
-                    mediaSession.controller.transportControls.skipToNext()
-                }
+                } else mediaSession.controller.transportControls.skipToNext()
             }
         }
     }
@@ -278,10 +258,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
     private fun getMetadataBuilder(track: Track): MediaMetadataCompat.Builder {
         return MediaMetadataCompat.Builder().apply {
             if (track.isAlbumArtAvailable) {
-                putString(
-                    MediaMetadata.METADATA_KEY_ALBUM_ART_URI,
-                    track.albumArtRef
-                )
+                putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, track.albumArtRef)
             }
             putString(MediaMetadata.METADATA_KEY_TITLE, track.title)
             putString(MediaMetadata.METADATA_KEY_ALBUM, track.album)
@@ -336,18 +313,14 @@ class PlaybackService : MediaBrowserServiceCompat(),
 
     private suspend fun getTracks(sourceKind: String?, mediaId: Long): List<Track> {
         return when(sourceKind) {
-            KIND_TRACKS_COLLECTION -> getAllTracks()
+            KIND_TRACKS_COLLECTION -> trackUseCases.getTracksFromCache()
             KIND_ALBUM -> getTracksOfAlbum(albumId = mediaId)
             KIND_ARTIST -> getTracksOfArtist(artistId = mediaId)
             KIND_PLAYLIST -> getTracksOfPlaylist(playlistId = mediaId)
-            KIND_NOW_PLAYING -> getCurrentSource()
+            KIND_NOW_PLAYING -> playbackSourceHelper.getCurrentSource()
             else -> emptyList()
         }
     }
-
-    private fun getCurrentSource() = playbackSourceHelper.getCurrentSource()
-
-    private suspend fun getAllTracks() = trackUseCases.getTracksFromCache()
 
     private suspend fun getTracksOfAlbum(albumId: Long): List<Track> {
         val ( _, tracks) = albumUseCases.getAlbumWithTracks(albumId)
