@@ -15,10 +15,6 @@ import com.peeranm.melodeez.feature_music_playback.use_cases.album_use_cases.*
 import com.peeranm.melodeez.feature_music_playback.data.repository.impl.ArtistRepositoryImpl
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.RepeatStateHelper
 import com.peeranm.melodeez.feature_music_playback.use_cases.artist_use_cases.*
-import com.peeranm.melodeez.feature_music_playback.use_cases.now_playing_use_cases.AddTrackToQueueUseCase
-import com.peeranm.melodeez.feature_music_playback.use_cases.now_playing_use_cases.GetCurrentSourceUseCase
-import com.peeranm.melodeez.feature_music_playback.use_cases.now_playing_use_cases.NowPlayingUseCases
-import com.peeranm.melodeez.feature_music_playback.use_cases.now_playing_use_cases.RemoveTrackFromQueueUseCase
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.*
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.impl.*
 import dagger.Module
@@ -169,16 +165,6 @@ object AppModule {
             deleteArtist = DeleteArtistUseCase(artistRepository),
             deleteArtists = DeleteArtistsUseCase(artistRepository),
             synchronizeArtists = SynchronizeArtistsUseCase(musicSource, artistRepository)
-        )
-    }
-
-    @Singleton
-    @Provides
-    fun provideNowPlayingUseCases(playbackSourceHelper: PlaybackSourceHelper): NowPlayingUseCases {
-        return NowPlayingUseCases(
-            removeTrackFromQueue = RemoveTrackFromQueueUseCase(playbackSourceHelper),
-            getCurrentSource = GetCurrentSourceUseCase(playbackSourceHelper),
-            addTrackToQueue = AddTrackToQueueUseCase(playbackSourceHelper)
         )
     }
 

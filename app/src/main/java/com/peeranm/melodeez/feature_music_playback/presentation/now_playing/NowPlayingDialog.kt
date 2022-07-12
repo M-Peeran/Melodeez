@@ -5,26 +5,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.KIND_NOW_PLAYING
 import com.peeranm.melodeez.core.MEDIA_POSITION
-import com.peeranm.melodeez.core.collectWithLifecycle
 import com.peeranm.melodeez.core.showToast
 import com.peeranm.melodeez.databinding.NowPlayingDialogBinding
-import com.peeranm.melodeez.feature_music_playback.data.device_storage.SourceAction
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.NowPlayingAdapter
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.PlaybackSourceHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NowPlayingDialog : BottomSheetDialogFragment(),OnItemClickListener<Track> {
 
-    private val viewModel: NowPlayingViewModel by viewModels()
+    @Inject lateinit var playbackSourceHelper: PlaybackSourceHelper
 
     private var _binding: NowPlayingDialogBinding? = null
     private val binding: NowPlayingDialogBinding
@@ -57,31 +56,31 @@ class NowPlayingDialog : BottomSheetDialogFragment(),OnItemClickListener<Track> 
         binding.listNowPlaying.layoutManager = layoutManager
         binding.listNowPlaying.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
 
-        collectWithLifecycle(viewModel.sourceAction) { sourceAction ->
-            when (sourceAction) {
-                SourceAction.PlayFromBeginning -> {
-                    val keyBundle = Bundle()
-                    keyBundle.putInt(MEDIA_POSITION, 0)
-                    controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
-                }
-                SourceAction.Stop -> controls.stop()
-                else -> Unit
-            }
+        playbackSourceHelper.getCurrentSource().let {
+            if (it.isEmpty()) showToast("No tracks in queue")
+            else adapter?.submitData(it)
         }
-
-        collectWithLifecycle(viewModel.currentSource) { source ->
-            if (source.isEmpty()) {
-                showToast("No tracks in queue")
-            } else adapter?.submitData(source)
-        }
-
-        viewModel.onEvent(Event.GetCurrentSource)
     }
 
     override fun onItemClick(view: View?, data: Track, position: Int) {
         when (view?.id) {
             R.id.btnClear -> {
-                viewModel.onEvent(Event.RemoveTrackFromQueue(position))
+                val currentSource = playbackSourceHelper.getCurrentSource() as MutableList
+                currentSource.removeAt(position)
+                playbackSourceHelper.setCurrentSource(currentSource)
+                when {
+                    position == playbackSourceHelper.getCurrentTrackPosition() -> {
+                        if (playbackSourceHelper.getCurrentSourceSize() > 0) {
+                            val keyBundle = Bundle()
+                            keyBundle.putInt(MEDIA_POSITION, 0)
+                            controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
+                        } else controls.stop()
+                    }
+                    position < playbackSourceHelper.getCurrentTrackPosition() -> {
+                        val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
+                        playbackSourceHelper.setTrackPosition(currentTrackPosition-1)
+                    }
+                }
                 adapter?.notifyItemRemoved(position)
             }
             else -> {

@@ -5,22 +5,21 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
-import com.peeranm.melodeez.core.collectWithLifecycle
 import com.peeranm.melodeez.core.showToast
 import com.peeranm.melodeez.databinding.TrackDetailsDialogBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_playlist.details.select_playlist_dialog.SelectPlaylistDialog
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.PlaybackSourceHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TrackDetailsDialog(private val track: Track) : DialogFragment() {
 
+    @Inject lateinit var playbackSourceHelper: PlaybackSourceHelper
     private var _binding: TrackDetailsDialogBinding? = null
     private val binding: TrackDetailsDialogBinding
     get() = _binding!!
-
-    private val viewModel: TrackDetailsViewModel by viewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return AlertDialog.Builder(requireContext()).apply {
@@ -32,15 +31,6 @@ class TrackDetailsDialog(private val track: Track) : DialogFragment() {
     private fun getDialogView(): View {
         _binding = TrackDetailsDialogBinding.inflate(layoutInflater)
 
-        collectWithLifecycle(viewModel.isSuccessful) { isSuccessful ->
-            isSuccessful?.let {
-                if (isSuccessful) {
-                    showToast("Added to queue")
-                } else {
-                    showToast("Failed : queue is empty")
-                }
-            }
-        }
         binding.apply {
             textAlbum.text = track.album
             textArtist.text = track.artist
@@ -51,7 +41,16 @@ class TrackDetailsDialog(private val track: Track) : DialogFragment() {
 
             textAddToQueue.setOnClickListener {
                 dismiss()
-                viewModel.onEvent(Event.AddToQueue(track))
+                val tracks = playbackSourceHelper.getCurrentSource()
+                val isNotEmpty = (tracks.isNotEmpty())
+                val trackNotExists = !tracks.contains(track)
+                if (isNotEmpty && trackNotExists) {
+                    (tracks as MutableList).add(track)
+                    playbackSourceHelper.setCurrentSource(tracks)
+                    showToast("Added to queue")
+                    return@setOnClickListener
+                }
+                showToast("Failed : queue is empty")
             }
         }
         return binding.root
