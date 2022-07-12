@@ -3,6 +3,7 @@ package com.peeranm.melodeez.feature_music_playback.presentation.player_ui
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaMetadata
 import android.os.Bundle
@@ -138,69 +139,66 @@ class PlayerFragment : Fragment() {
             )
             val imageLoadRequest = requireContext().getImageRequest(albumArtRef.toString(), imageAlbumArt)
             lifecycleScope.launch { requireContext().imageLoader.execute(imageLoadRequest) }
+            generateBackgroundColors(albumArt)
+        } else generateDefaultBackgroundColors()
+    }
 
-            Palette.from(albumArt).generate {
-                val swatch = it?.darkVibrantSwatch ?: it?.darkMutedSwatch ?: it?.mutedSwatch
-                swatch?.run {
-                    val prevColor = (root.background as ColorDrawable).color
-                    ValueAnimator().apply {
-                        setIntValues(prevColor, rgb)
-                        setEvaluator(ArgbEvaluator())
-                        addUpdateListener {
-                            root.setBackgroundColor(animatedValue as Int)
-                            activity?.run { window.statusBarColor = animatedValue as Int }
-                        }
-                    }.setDuration(1000).start()
-                    textStartTime.setTextColor(titleTextColor)
-                    textEndTime.setTextColor(titleTextColor)
-                    textTitle.setTextColor(bodyTextColor)
-                    textAlbum.setTextColor(titleTextColor)
-                    textArtist.setTextColor(titleTextColor)
-                    seekbarProgress.progressTintList = ColorStateList.valueOf(titleTextColor)
-                }
-            }
-        } else {
-            imageAlbumArt.load(R.drawable.album_art_none)
-            seekbarProgress.progressTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.grey_200
-                )
+    private fun PlayerFragmentBinding.generateDefaultBackgroundColors() {
+        imageAlbumArt.load(R.drawable.album_art_none)
+        seekbarProgress.progressTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.grey_200
             )
-            activity?.run {
-                window.statusBarColor = ContextCompat.getColor(
-                    requireContext(),
-                    R.color.grey_800
-                )
-            }
-            root.setBackgroundColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.grey_600
-                )
+        )
+        activity?.run {
+            window.statusBarColor = ContextCompat.getColor(
+                requireContext(),
+                R.color.grey_800
             )
+        }
+        root.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.grey_600
+            )
+        )
+    }
+
+    private fun PlayerFragmentBinding.generateBackgroundColors(albumArt: Bitmap) {
+        Palette.from(albumArt).generate {
+            val swatch = it?.darkVibrantSwatch ?: it?.darkMutedSwatch ?: it?.mutedSwatch
+            swatch?.run {
+                val prevColor = (root.background as ColorDrawable).color
+                ValueAnimator().apply {
+                    setIntValues(prevColor, rgb)
+                    setEvaluator(ArgbEvaluator())
+                    addUpdateListener {
+                        root.setBackgroundColor(animatedValue as Int)
+                        activity?.run { window.statusBarColor = animatedValue as Int }
+                    }
+                }.setDuration(1000).start()
+                textStartTime.setTextColor(titleTextColor)
+                textEndTime.setTextColor(titleTextColor)
+                textTitle.setTextColor(bodyTextColor)
+                textAlbum.setTextColor(titleTextColor)
+                textArtist.setTextColor(titleTextColor)
+                seekbarProgress.progressTintList = ColorStateList.valueOf(titleTextColor)
+            }
         }
     }
 
     private fun PlayerFragmentBinding.updateState(state: PlaybackStateCompat) {
         updateProgress(state.state)
         when (state.state) {
-            PlaybackStateCompat.STATE_PAUSED -> {
-                binding.btnPlayPause.setImageResource(R.drawable.ic_play)
-            }
-            PlaybackStateCompat.STATE_PLAYING -> {
-                binding.btnPlayPause.setImageResource(R.drawable.ic_pause)
-            }
-            PlaybackStateCompat.STATE_SKIPPING_TO_NEXT -> {
-                binding.btnPlayPause.setImageResource(R.drawable.ic_play)
-            }
-            PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS -> {
-                binding.btnPlayPause.setImageResource(R.drawable.ic_play)
-            }
+            PlaybackStateCompat.STATE_PAUSED -> btnPlayPause.setImageResource(R.drawable.ic_play)
+            PlaybackStateCompat.STATE_PLAYING -> btnPlayPause.setImageResource(R.drawable.ic_pause)
+            PlaybackStateCompat.STATE_SKIPPING_TO_NEXT -> btnPlayPause.setImageResource(R.drawable.ic_play)
+            PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS -> btnPlayPause.setImageResource(R.drawable.ic_play)
             PlaybackStateCompat.STATE_NONE -> {
-                binding.textStartTime.text = getString(R.string.start_time)
-                binding.seekbarProgress.progress = 0
-                binding.btnPlayPause.setImageResource(R.drawable.ic_play)
+                textStartTime.text = getString(R.string.start_time)
+                seekbarProgress.progress = 0
+                btnPlayPause.setImageResource(R.drawable.ic_play)
             }
             else -> Unit
         }
@@ -218,30 +216,28 @@ class PlayerFragment : Fragment() {
                 is RepeatState.RepeatOne -> {
                     btnRepeat.setImageResource(R.drawable.ic_repeat_one)
                 }
-                else -> Unit
             }
         }
     }
 
     private fun PlayerFragmentBinding.updateProgress(state: Int) {
-        when (state) {
-            PlaybackStateCompat.STATE_PLAYING -> {
-                cancelProgress()
-                val endTime = trackInfo.metadataAsFlow.value?.getLong(MediaMetadata.METADATA_KEY_DURATION)!!
-                progressJob = lifecycleScope.launch {
-                    textEndTime.text = getTimeStamp(endTime)
-                    seekbarProgress.max = endTime.toInt()
-                    while (isActive) {
-                        if (playbackHelper.isPlaying()) {
-                            seekbarProgress.progress = playbackHelper.getPlaybackPosition()
-                            textStartTime.text = getTimeStamp(seekbarProgress.progress.toLong())
-                        } else cancelProgress()
-                        delay(1000L)
+        if (state == PlaybackStateCompat.STATE_PLAYING) {
+            cancelProgress()
+            val endTime = trackInfo.metadataAsFlow.value?.getLong(MediaMetadata.METADATA_KEY_DURATION)!!
+            textEndTime.text = getTimeStamp(endTime)
+            seekbarProgress.max = endTime.toInt()
+            progressJob = lifecycleScope.launch {
+                while (isActive) {
+                    if (!playbackHelper.isPlaying()) {
+                        cancelProgress()
+                        return@launch
                     }
+                    seekbarProgress.progress = playbackHelper.getPlaybackPosition()
+                    textStartTime.text = getTimeStamp(seekbarProgress.progress.toLong())
+                    delay(1000L)
                 }
             }
-            else -> cancelProgress()
-        }
+        } else cancelProgress()
     }
 
     override fun onStop() {
