@@ -5,27 +5,23 @@ import com.peeranm.melodeez.core.RepeatState
 
 class RepeatStateHelper {
 
-    private var repeatState: RepeatState? = null
+    private var repeatState: RepeatState = RepeatState.RepeatOff
 
     fun getState() = repeatState
 
     fun toggleState(): RepeatState {
         return when(getState()) {
-            null -> {
-                repeatState = RepeatState.RepeatAll
-                getState()!!
-            }
             is RepeatState.RepeatOff -> {
                 repeatState = RepeatState.RepeatAll
-                getState()!!
+                getState()
             }
             is RepeatState.RepeatAll -> {
                 repeatState = RepeatState.RepeatOne
-                getState()!!
+                getState()
             }
             is RepeatState.RepeatOne -> {
                 repeatState = RepeatState.RepeatOff
-                getState()!!
+                getState()
             }
         }
     }
