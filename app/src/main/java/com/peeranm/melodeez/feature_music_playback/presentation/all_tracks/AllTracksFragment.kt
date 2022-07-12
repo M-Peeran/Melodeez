@@ -37,6 +37,7 @@ class AllTracksFragment : Fragment(), OnItemClickListener<Track> {
     private val viewModel: AllTracksViewModel by viewModels()
 
     private var adapter: TrackAdapter? = null
+    private var isPermissionGranted = false
 
     private val controls: MediaController.TransportControls
     get() = requireActivity().mediaController.transportControls
@@ -56,58 +57,23 @@ class AllTracksFragment : Fragment(), OnItemClickListener<Track> {
 
     override fun onStart() {
         super.onStart()
-        val permission = ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        )
-        if (permission == PackageManager.PERMISSION_GRANTED) {
-            binding.progressbar.visibility = View.VISIBLE
-            viewModel.onEvent(Event.Synchronize)
-        }
+        binding.checkPermissions()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val permission = ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        )
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            val permissionLauncher = registerForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { isGranted ->
-                if (isGranted) {
-                    binding.progressbar.visibility = View.VISIBLE
-                    viewModel.onEvent(Event.Synchronize)
-                } else {
-                    binding.progressbar.visibility = View.GONE
-                    showToast("Permission Denied")
-                    requireActivity().finish()
-                }
-            }
-            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-
-        adapter = TrackAdapter(requireContext(), lifecycleScope, this)
-        binding.listTracks.adapter = adapter
-        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.listTracks.layoutManager = layoutManager
-        binding.listTracks.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+        binding.requestPermissionsIfNotGrantedAlready()
+        binding.bindList()
 
         collectLatestWithLifecycle(viewModel.tracks) { tracks ->
-            if (tracks.isNotEmpty()) {
-                binding.progressbar.visibility = View.GONE
-                adapter?.submitData(tracks)
-            }
+            binding.toggleProgressBarVisibility()
+            if (tracks.isNotEmpty()) adapter?.submitData(tracks)
         }
     }
 
     override fun onItemClick(view: View?, data: Track, position: Int) {
         when (view?.id) {
-            R.id.btnOptions -> {
-                TrackDetailsDialog.getInstance(data).show(childFragmentManager, "TRACK")
-            }
+            R.id.btnOptions -> TrackDetailsDialog.getInstance(data).show(childFragmentManager, "TRACK")
             else -> {
                 val keyBundle = Bundle()
                 keyBundle.putInt(MEDIA_POSITION, position)
@@ -117,6 +83,54 @@ class AllTracksFragment : Fragment(), OnItemClickListener<Track> {
                 )
             }
         }
+    }
+
+    private fun AllTracksFragmentBinding.bindList() {
+        adapter = TrackAdapter(requireContext(), lifecycleScope, this@AllTracksFragment)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listTracks.adapter = adapter
+        listTracks.layoutManager = layoutManager
+        listTracks.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+    }
+
+    private fun AllTracksFragmentBinding.checkPermissions() {
+        toggleProgressBarVisibility(showNow = true)
+        val permission = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            isPermissionGranted = true
+            toggleProgressBarVisibility()
+            viewModel.onEvent(Event.Synchronize)
+        }
+    }
+
+    private fun AllTracksFragmentBinding.requestPermissionsIfNotGrantedAlready() {
+        if (isPermissionGranted) return
+        val permission = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            val permissionLauncher = registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted) {
+                    toggleProgressBarVisibility(showNow = true)
+                    viewModel.onEvent(Event.Synchronize)
+                } else {
+                    toggleProgressBarVisibility()
+                    showToast("Permission Denied")
+                    requireActivity().finish()
+                }
+            }
+            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+    }
+
+    private fun AllTracksFragmentBinding.toggleProgressBarVisibility(showNow: Boolean = false) {
+        progressbar.visibility = if (showNow) View.VISIBLE else View.GONE
     }
 
     override fun onDestroyView() {
