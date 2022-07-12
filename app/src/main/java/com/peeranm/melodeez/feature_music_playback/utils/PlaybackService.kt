@@ -223,26 +223,36 @@ class PlaybackService : MediaBrowserServiceCompat(),
 
     override fun onCompletion(mediaPlayer: MediaPlayer?) {
         when (repeatStateHelper.getState()) {
-            is RepeatState.RepeatOne -> playbackHelper.resumePlayback()
-            is RepeatState.RepeatOff -> {
-                val tracksSize = playbackSourceHelper.getCurrentSourceSize()
-                val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
-                if (currentTrackPosition+1 == tracksSize) {
-                    Toast.makeText(baseContext, "Queue ended", Toast.LENGTH_SHORT).show()
-                    val playbackState = getStateBuilder(PlaybackStateCompat.STATE_NONE).build()
-                    mediaSession.setPlaybackState(playbackState)
-                    trackInfo.updateState(playbackState)
-                } else mediaSession.controller.transportControls.skipToNext()
-            }
-            is RepeatState.RepeatAll -> {
-                val tracksSize = playbackSourceHelper.getCurrentSourceSize()
-                val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
-                if (currentTrackPosition+1 == tracksSize) {
-                    val bundle = bundleOf(MEDIA_POSITION to 0)
-                    mediaSession.controller.transportControls.playFromMediaId(KIND_NOW_PLAYING, bundle)
-                } else mediaSession.controller.transportControls.skipToNext()
-            }
+            is RepeatState.RepeatOne -> playbackHelper.resumePlayback() // Replays current track
+            is RepeatState.RepeatOff -> playNextTrackOrStopPlayback()
+            is RepeatState.RepeatAll -> replayFromStart()
         }
+    }
+
+    private fun playNextTrackOrStopPlayback() {
+        val tracksSize = playbackSourceHelper.getCurrentSourceSize()
+        val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
+        val isLastTrackPlayed = currentTrackPosition + 1 == tracksSize
+        if (isLastTrackPlayed) {
+            Toast.makeText(baseContext, "Queue ended", Toast.LENGTH_SHORT).show()
+            val playbackState = getStateBuilder(PlaybackStateCompat.STATE_NONE).build()
+            mediaSession.setPlaybackState(playbackState)
+            trackInfo.updateState(playbackState)
+            return
+        }
+        mediaSession.controller.transportControls.skipToNext()
+    }
+
+    private fun replayFromStart() {
+        val tracksSize = playbackSourceHelper.getCurrentSourceSize()
+        val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
+        val isLastTrackPlayed = currentTrackPosition + 1 == tracksSize
+        if (isLastTrackPlayed) {
+            val bundle = bundleOf(MEDIA_POSITION to 0)
+            mediaSession.controller.transportControls.playFromMediaId(KIND_NOW_PLAYING, bundle)
+            return
+        }
+        mediaSession.controller.transportControls.skipToNext()
     }
 
     override fun onReceive(action: String?) {
@@ -287,15 +297,19 @@ class PlaybackService : MediaBrowserServiceCompat(),
 
     override fun onCreate() {
         super.onCreate()
+        initialSetup()
+    }
+
+    private fun initialSetup() {
         mediaSession = MediaSessionCompat(baseContext, ACTIVITY_TAG).apply {
             setFlags(
                 MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
             )
             setPlaybackState(
                 PlaybackStateCompat.Builder().setActions(
                     PlaybackStateCompat.ACTION_PLAY_PAUSE or
-                    PlaybackStateCompat.ACTION_PLAY
+                            PlaybackStateCompat.ACTION_PLAY
                 ).setState(
                     PlaybackStateCompat.STATE_STOPPED,
                     PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,
@@ -339,6 +353,10 @@ class PlaybackService : MediaBrowserServiceCompat(),
 
     override fun onDestroy() {
         super.onDestroy()
+        cleanup()
+    }
+
+    private fun cleanup() {
         audioFocusHelper.abandonAudioFocus()
         notificationHelper.unregisterReceiver()
         playbackHelper.release()
