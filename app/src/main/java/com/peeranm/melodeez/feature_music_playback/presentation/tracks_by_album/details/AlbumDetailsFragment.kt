@@ -20,6 +20,7 @@ import coil.load
 import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.AlbumDetailsFragmentBinding
+import com.peeranm.melodeez.feature_music_playback.model.Album
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.all_tracks.details.TrackDetailsDialog
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
@@ -57,51 +58,18 @@ class AlbumDetailsFragment : Fragment(), OnItemClickListener<Track> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.setUpActionBar()
+        binding.bindList()
 
-        findNavController().let {
-            (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
-            binding.toolbar.setupWithNavController(
-                it,
-                AppBarConfiguration.Builder().setFallbackOnNavigateUpListener {
-                    it.navigateUp()
-                    true
-                }.build()
-            )
-            binding.toolbar.title = ""
+        collectWithLifecycle(viewModel.albumWithTracks) {
+            binding.bindAlbumAndTracks(it.album, it.tracks)
         }
-        adapter = SimpleTrackAdapter(requireContext(), this@AlbumDetailsFragment)
-        lifecycleScope.launch {
-            val albumId = args.albumId
-            val (album, tracks) = viewModel.getAlbumWithTracks(albumId)
-            binding.apply {
-                listTracksInAlbum.adapter = adapter
-                val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-                listTracksInAlbum.layoutManager = layoutManager
-                listTracksInAlbum.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
-                textAlbumName.text = album.name
-                textNoOfTracks.text = String.format(
-                    getString(R.string.no_of_tracks),
-                    tracks.size
-                )
-                textReleaseYear.text = String.format(
-                    getString(R.string.release_year),
-                    getReleaseYearString(album.releaseYear)
-                )
 
-                if (album.isAlbumArtAvailable) {
-                    val imageLoadRequest = requireContext().getImageRequest(album.albumArtRef, imageAlbumArt)
-                    lifecycleScope.launch { requireContext().imageLoader.execute(imageLoadRequest) }
-                } else imageAlbumArt.load(R.drawable.ic_music)
-            }
-            adapter?.submitData(tracks)
-        }
     }
 
     override fun onItemClick(view: View?, data: Track, position: Int) {
         when (view?.id) {
-            R.id.btnOptions -> {
-                TrackDetailsDialog.getInstance(data).show(childFragmentManager, "TRACK")
-            }
+            R.id.btnOptions -> TrackDetailsDialog.getInstance(data).show(childFragmentManager, "TRACK")
             else -> {
                 val keyBundle = Bundle()
                 keyBundle.putInt(MEDIA_POSITION, position)
@@ -112,6 +80,45 @@ class AlbumDetailsFragment : Fragment(), OnItemClickListener<Track> {
                 )
             }
         }
+    }
+
+    private fun AlbumDetailsFragmentBinding.setUpActionBar() {
+        findNavController().let { navController ->
+            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setupWithNavController(
+                navController,
+                AppBarConfiguration.Builder().setFallbackOnNavigateUpListener {
+                    navController.navigateUp()
+                    true
+                }.build()
+            )
+            toolbar.title = ""
+        }
+    }
+
+    private fun AlbumDetailsFragmentBinding.bindList() {
+        adapter = SimpleTrackAdapter(requireContext(), this@AlbumDetailsFragment)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listTracksInAlbum.adapter = adapter
+        listTracksInAlbum.layoutManager = layoutManager
+        listTracksInAlbum.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+    }
+
+    private fun AlbumDetailsFragmentBinding.bindAlbumAndTracks(album: Album, tracks: List<Track>) {
+        textAlbumName.text = album.name
+        textNoOfTracks.text = String.format(
+            getString(R.string.no_of_tracks),
+            tracks.size
+        )
+        textReleaseYear.text = String.format(
+            getString(R.string.release_year),
+            getReleaseYearString(album.releaseYear)
+        )
+        if (album.isAlbumArtAvailable) {
+            val imageLoadRequest = requireContext().getImageRequest(album.albumArtRef, imageAlbumArt)
+            lifecycleScope.launch { requireContext().imageLoader.execute(imageLoadRequest) }
+        } else imageAlbumArt.load(R.drawable.ic_music)
+        adapter?.submitData(tracks)
     }
 
     override fun onDestroyView() {

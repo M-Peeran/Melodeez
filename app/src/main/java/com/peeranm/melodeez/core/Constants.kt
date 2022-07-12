@@ -25,3 +25,4 @@ const val MEDIA_KEY_NONE = -1L
 const val MEDIA_POSITION = "media_pos"
 const val ITEM_TYPE_PLAYLIST = 1
 const val ITEM_TYPE_CREATE_NEW_PLAYLIST = 2
+const val ARG_ALBUM_ID = "albumId"
