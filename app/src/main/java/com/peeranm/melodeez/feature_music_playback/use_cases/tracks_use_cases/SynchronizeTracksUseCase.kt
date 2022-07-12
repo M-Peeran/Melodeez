@@ -1,32 +1,29 @@
 package com.peeranm.melodeez.feature_music_playback.use_cases.tracks_use_cases
 
 import android.util.Log
+import com.peeranm.melodeez.feature_music_playback.data.device_storage.MusicSource
+import com.peeranm.melodeez.feature_music_playback.data.repository.TrackRepository
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 
 class SynchronizeTracksUseCase(
-    private val insertTrack: InsertTrackUseCase,
-    private val deleteTrack: DeleteTrackUseCase,
-    private val deleteTracks: DeleteTracksUseCase,
-    private val getTracksFromCache: GetTracksFromCacheUseCase,
-    private val getTracksFromStorage: GetTracksFromStorageUseCase
+    private val musicSource: MusicSource,
+    private val trackRepository: TrackRepository
 ){
     suspend operator fun invoke() = withContext(Dispatchers.IO) {
-        val newTracks = getTracksFromStorage()
+        val newTracks = musicSource.getTracksFromStorage()
 
         if (newTracks.isEmpty()) {
-            deleteTracks()
+            trackRepository.deleteTracks()
             return@withContext
         }
 
-        val cachedTracks = getTracksFromCache()
+        val cachedTracks = trackRepository.getTracks()
 
         if (cachedTracks.isEmpty()) {
             Log.i("APP_LOGS", "NO TRACKS IN CACHE!")
-            newTracks.forEach { insertTrack(it) }
+            newTracks.forEach { trackRepository.insert(it) }
             return@withContext
         }
 
@@ -40,13 +37,13 @@ class SynchronizeTracksUseCase(
 
         for ((uri, track) in cachedTracksMap) {
             if (!newTracksMap.containsKey(uri)) {
-                deleteTrack(track.trackId)
+                trackRepository.deleteTrack(track.trackId)
             }
         }
 
         for ((uri, track) in newTracksMap) {
             if (!cachedTracksMap.containsKey(uri)) {
-                insertTrack(track)
+                trackRepository.insert(track)
             }
         }
     }

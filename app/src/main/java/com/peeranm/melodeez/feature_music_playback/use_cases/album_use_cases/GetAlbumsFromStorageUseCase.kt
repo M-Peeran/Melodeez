@@ -1,8 +1,7 @@
 package com.peeranm.melodeez.feature_music_playback.use_cases.album_use_cases
 
-import android.content.Context
-import com.peeranm.melodeez.feature_music_playback.data.device_storage.AlbumsSource
+import com.peeranm.melodeez.feature_music_playback.data.device_storage.MusicSource
 
-class GetAlbumsFromStorageUseCase(private val context: Context, private val albumsSource: AlbumsSource) {
-    operator fun invoke() = albumsSource.getAlbumsFromStorage(context)
+class GetAlbumsFromStorageUseCase(private val musicSource: MusicSource) {
+    operator fun invoke() = musicSource.getAlbumsFromStorage()
 }

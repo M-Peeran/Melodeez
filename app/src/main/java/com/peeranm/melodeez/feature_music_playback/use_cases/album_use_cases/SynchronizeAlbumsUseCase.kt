@@ -1,27 +1,26 @@
 package com.peeranm.melodeez.feature_music_playback.use_cases.album_use_cases
 
+import com.peeranm.melodeez.feature_music_playback.data.device_storage.MusicSource
+import com.peeranm.melodeez.feature_music_playback.data.repository.AlbumRepository
 import com.peeranm.melodeez.feature_music_playback.model.Album
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SynchronizeAlbumsUseCase(
-    private val getAlbumsFromStorage: GetAlbumsFromStorageUseCase,
-    private val getAlbumsFromCache: GetAlbumsFromCacheUseCase,
-    private val insertAlbum: InsertAlbumUseCase,
-    private val deleteAlbum: DeleteAlbumUseCase,
-    private val deleteAlbums: DeleteAlbumsUseCase
+    private val musicSource: MusicSource,
+    private val albumRepository: AlbumRepository
 ) {
     suspend operator fun invoke() = withContext(Dispatchers.IO) {
-        val newAlbums = getAlbumsFromStorage()
+        val newAlbums = musicSource.getAlbumsFromStorage()
 
         if (newAlbums.isEmpty()) {
-            deleteAlbums()
+            albumRepository.deleteAlbums()
             return@withContext
         }
 
-        val cachedAlbums = getAlbumsFromCache()
+        val cachedAlbums = albumRepository.getAlbums()
         if (cachedAlbums.isEmpty()) {
-            newAlbums.forEach { insertAlbum(it) }
+            newAlbums.forEach { albumRepository.insertAlbum(it) }
             return@withContext
         }
 
@@ -35,13 +34,13 @@ class SynchronizeAlbumsUseCase(
 
         for ((albumName, album) in cachedAlbumsMap) {
             if (!newAlbumsMap.containsKey(albumName)) {
-                deleteAlbum(album)
+                albumRepository.deleteAlbum(album)
             }
         }
 
         for ((albumName, album) in newAlbumsMap) {
             if (!cachedAlbumsMap.containsKey(albumName)) {
-                insertAlbum(album)
+                albumRepository.insertAlbum(album)
             }
         }
     }

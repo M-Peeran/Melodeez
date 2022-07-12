@@ -4,8 +4,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
-import com.peeranm.melodeez.feature_music_playback.data.device_storage.AlbumsSource
-import com.peeranm.melodeez.feature_music_playback.data.device_storage.TracksSource
+import com.peeranm.melodeez.feature_music_playback.data.device_storage.MusicSource
 import com.peeranm.melodeez.feature_music_playback.data.local.MusicDatabase
 import com.peeranm.melodeez.feature_music_playback.data.repository.impl.PlaylistRepositoryImpl
 import com.peeranm.melodeez.feature_music_playback.use_cases.playlist_use_cases.*
@@ -86,6 +85,12 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideMusicSource(@ApplicationContext context: Context): MusicSource {
+        return MusicSource(context)
+    }
+
+    @Singleton
+    @Provides
     fun providePlaylistUseCases(database: MusicDatabase): PlaylistUseCases {
         val playlistRepository = PlaylistRepositoryImpl(database)
         val getPlaylist = GetPlaylistUseCase(playlistRepository)
@@ -114,97 +119,56 @@ object AppModule {
     @Singleton
     @Provides
     fun provideTrackUseCases(
-        @ApplicationContext context: Context,
+        musicSource: MusicSource,
         database: MusicDatabase
     ): TrackUseCases {
-        val trackRepository = TrackRepositoryImpl(database.trackDao(),)
-        val getTracksFromStorage = GetTracksFromStorageUseCase(context, TracksSource())
-        val getTracksFromCache = GetTracksFromCacheUseCase(trackRepository)
-        val getTracksFromCacheForUi = GetTracksFromCacheForUiUseCase(trackRepository)
-        val insertTrack = InsertTrackUseCase(trackRepository)
-        val deleteTrack = DeleteTrackUseCase(trackRepository)
-        val deleteTracks = DeleteTracksUseCase(trackRepository)
-        val synchronizeTracks = SynchronizeTracksUseCase(
-            insertTrack = insertTrack,
-            deleteTrack = deleteTrack,
-            deleteTracks = deleteTracks,
-            getTracksFromCache = getTracksFromCache,
-            getTracksFromStorage = getTracksFromStorage
-        )
+        val trackRepository = TrackRepositoryImpl(database.trackDao())
         return TrackUseCases(
-            getTracksFromStorage = getTracksFromStorage,
-            getTracksFromCache = getTracksFromCache,
-            getTracksFromCacheForUi = getTracksFromCacheForUi,
-            insertTrack = insertTrack,
-            deleteTrack = deleteTrack,
-            deleteTracks = deleteTracks,
-            synchronizeTracks = synchronizeTracks
+            getTracksFromStorage = GetTracksFromStorageUseCase(musicSource),
+            getTracksFromCache = GetTracksFromCacheUseCase(trackRepository),
+            getTracksFromCacheForUi = GetTracksFromCacheForUiUseCase(trackRepository),
+            insertTrack = InsertTrackUseCase(trackRepository),
+            deleteTrack = DeleteTrackUseCase(trackRepository),
+            deleteTracks = DeleteTracksUseCase(trackRepository),
+            synchronizeTracks = SynchronizeTracksUseCase(musicSource, trackRepository)
         )
     }
 
     @Provides
     @Singleton
     fun provideAlbumUseCases(
-        @ApplicationContext context: Context,
+        musicSource: MusicSource,
         database: MusicDatabase
     ): AlbumUseCases {
-        val albumRepository = AlbumRepositoryImpl(database.albumDao(),)
-        val getAlbumsFromStorage = GetAlbumsFromStorageUseCase(context, AlbumsSource())
-        val getAlbumsFromCache = GetAlbumsFromCacheUseCase(albumRepository)
-        val getAlbumsForUi = GetAlbumsFromCacheForUiUseCase(albumRepository)
-        val getAlbumWithTracks = GetAlbumWithTracksUseCase(albumRepository)
-        val insertAlbum = InsertAlbumUseCase(albumRepository)
-        val deleteAlbum = DeleteAlbumUseCase(albumRepository)
-        val deleteAlbums = DeleteAlbumsUseCase(albumRepository)
-        val synchronizeAlbums = SynchronizeAlbumsUseCase(
-            getAlbumsFromStorage = getAlbumsFromStorage,
-            getAlbumsFromCache = getAlbumsFromCache,
-            insertAlbum = insertAlbum,
-            deleteAlbum = deleteAlbum,
-            deleteAlbums = deleteAlbums
-        )
+        val albumRepository = AlbumRepositoryImpl(database.albumDao())
         return AlbumUseCases(
-            getAlbumsFromStorage = getAlbumsFromStorage,
-            getAlbumsFromCache = getAlbumsFromCache,
-            getAlbumsFromCacheForUi = getAlbumsForUi,
-            getAlbumWithTracks = getAlbumWithTracks,
-            insertAlbum = insertAlbum,
-            deleteAlbum = deleteAlbum,
-            deleteAlbums = deleteAlbums,
-            synchronizeAlbums = synchronizeAlbums
+            getAlbumsFromStorage = GetAlbumsFromStorageUseCase(musicSource),
+            getAlbumsFromCache = GetAlbumsFromCacheUseCase(albumRepository),
+            getAlbumsFromCacheForUi = GetAlbumsFromCacheForUiUseCase(albumRepository),
+            getAlbumWithTracks = GetAlbumWithTracksUseCase(albumRepository),
+            insertAlbum = InsertAlbumUseCase(albumRepository),
+            deleteAlbum = DeleteAlbumUseCase(albumRepository),
+            deleteAlbums = DeleteAlbumsUseCase(albumRepository),
+            synchronizeAlbums = SynchronizeAlbumsUseCase(musicSource, albumRepository)
         )
     }
 
     @Provides
     @Singleton
     fun provideArtistUseCases(
-        @ApplicationContext context: Context,
+        musicSource: MusicSource,
         database: MusicDatabase
     ): ArtistUseCases {
         val artistRepository = ArtistRepositoryImpl(database.artistDao())
-        val getArtistsFromStorage = GetArtistsFromStorageUseCase(context)
-        val getArtistsFromCache = GetArtistsFromCacheUseCase(artistRepository)
-        val getArtistsForUi = GetArtistsForUiUseCase(artistRepository)
-        val getArtistWithTracks = GetArtistWithTracksUseCase(artistRepository)
-        val insertArtist = InsertArtistUseCase(artistRepository)
-        val deleteArtist = DeleteArtistUseCase(artistRepository)
-        val deleteArtists = DeleteArtistsUseCase(artistRepository)
-        val synchronizeArtists = SynchronizeArtistsUseCase(
-            insertArtist = insertArtist,
-            getArtistsFromCache = getArtistsFromCache,
-            getArtistsFromStorage = getArtistsFromStorage,
-            deleteArtist = deleteArtist,
-            deleteArtists = deleteArtists
-        )
         return ArtistUseCases(
-            getArtistsFromStorage = getArtistsFromStorage,
-            getArtistsFromCache = getArtistsFromCache,
-            getArtistsForUi = getArtistsForUi,
-            getArtistWithTracks = getArtistWithTracks,
-            insertArtist = insertArtist,
-            deleteArtist = deleteArtist,
-            deleteArtists = deleteArtists,
-            synchronizeArtists = synchronizeArtists
+            getArtistsFromStorage = GetArtistsFromStorageUseCase(musicSource),
+            getArtistsFromCache = GetArtistsFromCacheUseCase(artistRepository),
+            getArtistsForUi = GetArtistsForUiUseCase(artistRepository),
+            getArtistWithTracks = GetArtistWithTracksUseCase(artistRepository),
+            insertArtist = InsertArtistUseCase(artistRepository),
+            deleteArtist = DeleteArtistUseCase(artistRepository),
+            deleteArtists = DeleteArtistsUseCase(artistRepository),
+            synchronizeArtists = SynchronizeArtistsUseCase(musicSource, artistRepository)
         )
     }
 

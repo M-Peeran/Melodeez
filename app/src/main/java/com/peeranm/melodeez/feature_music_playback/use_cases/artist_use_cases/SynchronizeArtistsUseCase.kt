@@ -1,27 +1,27 @@
 package com.peeranm.melodeez.feature_music_playback.use_cases.artist_use_cases
 
+import com.peeranm.melodeez.feature_music_playback.data.device_storage.MusicSource
+import com.peeranm.melodeez.feature_music_playback.data.repository.ArtistRepository
 import com.peeranm.melodeez.feature_music_playback.model.Artist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SynchronizeArtistsUseCase(
-    private val insertArtist: InsertArtistUseCase,
-    private val getArtistsFromCache: GetArtistsFromCacheUseCase,
-    private val getArtistsFromStorage: GetArtistsFromStorageUseCase,
-    private val deleteArtist: DeleteArtistUseCase,
-    private val deleteArtists: DeleteArtistsUseCase
+    private val musicSource: MusicSource,
+    private val artistRepository: ArtistRepository
 ) {
     suspend operator fun invoke() = withContext(Dispatchers.IO) {
-        val newArtists = getArtistsFromStorage()
+
+        val newArtists = musicSource.getArtistsFromStorage()
 
         if (newArtists.isEmpty()) {
-            deleteArtists()
+            artistRepository.deleteArtists()
             return@withContext
         }
 
-        val cachedArtists = getArtistsFromCache()
+        val cachedArtists = artistRepository.getArtists()
         if (cachedArtists.isEmpty()) {
-            newArtists.forEach { insertArtist(it) }
+            newArtists.forEach { artistRepository.insertArtist(it) }
             return@withContext
         }
 
@@ -35,13 +35,13 @@ class SynchronizeArtistsUseCase(
 
         for ((artistName, artist) in cachedArtistMap) {
             if (!newArtistsMap.containsKey(artistName)) {
-                deleteArtist(artist)
+                artistRepository.deleteArtist(artist)
             }
         }
 
         for ((artistName, artist) in newArtistsMap) {
             if (!cachedArtistMap.containsKey(artistName)) {
-                insertArtist(artist)
+                artistRepository.insertArtist(artist)
             }
         }
     }
