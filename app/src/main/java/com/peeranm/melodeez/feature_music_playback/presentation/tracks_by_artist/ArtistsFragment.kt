@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.peeranm.melodeez.core.collectLatestWithLifecycle
 import com.peeranm.melodeez.databinding.ArtistsFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Artist
@@ -41,17 +43,14 @@ class ArtistsFragment : Fragment(), OnItemClickListener<Artist> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ArtistAdapter(this)
-        binding.listArtists.adapter = adapter
+        binding.bindList()
 
         collectLatestWithLifecycle(viewModel.artists) { artists ->
-           if (artists.isNotEmpty()) {
-               binding.progressbar.visibility = View.GONE
-               adapter?.submitData(artists)
-           }
+            binding.toggleProgressbarVisibility()
+           if (artists.isNotEmpty()) adapter?.submitData(artists)
         }
-        // Kick off
-        binding.progressbar.visibility = View.VISIBLE
+
+        binding.toggleProgressbarVisibility(showNow = true)
         viewModel.setStateEvent(Event.Synchronize)
     }
 
@@ -59,6 +58,18 @@ class ArtistsFragment : Fragment(), OnItemClickListener<Artist> {
         findNavController().navigate(
             ViewPagerHostFragmentDirections.actionMainFragmentToArtistDetailsFragment(data.artistId)
         )
+    }
+
+    private fun ArtistsFragmentBinding.bindList() {
+        adapter = ArtistAdapter(this@ArtistsFragment)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listArtists.adapter = adapter
+        listArtists.layoutManager = layoutManager
+        listArtists.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+    }
+
+    private fun ArtistsFragmentBinding.toggleProgressbarVisibility(showNow: Boolean = false) {
+        progressbar.visibility = if (showNow) View.VISIBLE else View.GONE
     }
 
     override fun onDestroyView() {
