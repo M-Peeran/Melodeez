@@ -34,6 +34,8 @@ class ViewPagerHostFragment : Fragment() {
 
     private val controller get() = requireActivity().mediaController
 
+    private var adapter: FragStateAdapter? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -60,25 +62,11 @@ class ViewPagerHostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        setupViewPager()
 
-        binding.apply {
-            miniPlayer.btnPlayPause.setOnClickListener {
-                if (controller.playbackState?.state == PlaybackStateCompat.STATE_PLAYING) {
-                    controller.transportControls.pause()
-                } else {
-                    controller.transportControls.play()
-                }
-            }
-            miniPlayer.btnNext.setOnClickListener {
-                controller.transportControls.skipToNext()
-            }
-            miniPlayer.root.setOnClickListener {
-                findNavController().navigate(
-                    ViewPagerHostFragmentDirections.actionMainFragmentToPlayerFragment()
-                )
-            }
-        }
+        binding.setupViewPager()
+        binding.handleOnMiniPlayerNextClick()
+        binding.handleOnBtnPlayPauseClick()
+        binding.handleOnBtnNextClick()
 
         collectWithLifecycle(trackInfo.stateAsFlow) {
             binding.updateState(it)
@@ -123,16 +111,41 @@ class ViewPagerHostFragment : Fragment() {
         }
     }
 
-    private fun setupViewPager() {
-        val adapter = FragStateAdapter(requireActivity())
-        binding.viewPager.adapter = adapter
+    private fun ViewPagerHostFragmentBinding.setupViewPager() {
+        adapter = FragStateAdapter(requireActivity())
+        viewPager.adapter = adapter
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = tabArray[position]
         }.attach()
     }
 
+    private fun ViewPagerHostFragmentBinding.handleOnBtnPlayPauseClick() {
+        miniPlayer.btnPlayPause.setOnClickListener {
+            if (controller.playbackState?.state == PlaybackStateCompat.STATE_PLAYING) {
+                controller.transportControls.pause()
+            } else {
+                controller.transportControls.play()
+            }
+        }
+    }
+
+    private fun ViewPagerHostFragmentBinding.handleOnBtnNextClick() {
+        miniPlayer.btnNext.setOnClickListener {
+            controller.transportControls.skipToNext()
+        }
+    }
+
+    private fun ViewPagerHostFragmentBinding.handleOnMiniPlayerNextClick() {
+        miniPlayer.root.setOnClickListener {
+            findNavController().navigate(
+                ViewPagerHostFragmentDirections.actionMainFragmentToPlayerFragment()
+            )
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        adapter = null
         _binding = null
     }
 }
