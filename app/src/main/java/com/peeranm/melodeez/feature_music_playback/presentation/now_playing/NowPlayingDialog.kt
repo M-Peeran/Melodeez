@@ -49,12 +49,7 @@ class NowPlayingDialog : BottomSheetDialogFragment(),OnItemClickListener<Track> 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        adapter = NowPlayingAdapter(requireContext(), this)
-        binding.listNowPlaying.adapter = adapter
-        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.listNowPlaying.layoutManager = layoutManager
-        binding.listNowPlaying.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+        binding.bindList()
 
         playbackSourceHelper.getCurrentSource().let {
             if (it.isEmpty()) showToast("No tracks in queue")
@@ -65,22 +60,7 @@ class NowPlayingDialog : BottomSheetDialogFragment(),OnItemClickListener<Track> 
     override fun onItemClick(view: View?, data: Track, position: Int) {
         when (view?.id) {
             R.id.btnClear -> {
-                val currentSource = playbackSourceHelper.getCurrentSource() as MutableList
-                currentSource.removeAt(position)
-                playbackSourceHelper.setCurrentSource(currentSource)
-                when {
-                    position == playbackSourceHelper.getCurrentTrackPosition() -> {
-                        if (playbackSourceHelper.getCurrentSourceSize() > 0) {
-                            val keyBundle = Bundle()
-                            keyBundle.putInt(MEDIA_POSITION, 0)
-                            controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
-                        } else controls.stop()
-                    }
-                    position < playbackSourceHelper.getCurrentTrackPosition() -> {
-                        val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
-                        playbackSourceHelper.setTrackPosition(currentTrackPosition-1)
-                    }
-                }
+                removeTrackFromQueueAndHandleQueue(position)
                 adapter?.notifyItemRemoved(position)
             }
             else -> {
@@ -88,6 +68,40 @@ class NowPlayingDialog : BottomSheetDialogFragment(),OnItemClickListener<Track> 
                 keyBundle.putInt(MEDIA_POSITION, position)
                 controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
             }
+        }
+    }
+
+    private fun NowPlayingDialogBinding.bindList() {
+        adapter = NowPlayingAdapter(requireContext(), this@NowPlayingDialog)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listNowPlaying.adapter = adapter
+        listNowPlaying.layoutManager = layoutManager
+        listNowPlaying.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+    }
+
+    private fun removeTrackFromQueueAndHandleQueue(position: Int) {
+        val currentSource = playbackSourceHelper.getCurrentSource() as MutableList
+        currentSource.removeAt(position)
+        playbackSourceHelper.setCurrentSource(currentSource)
+
+        val isRemovedTrackLastOne = playbackSourceHelper.getCurrentSourceSize() <= 0
+        if (isRemovedTrackLastOne) {
+            controls.stop()
+            return
+        }
+
+        val isRemovedTrackWasPlayingBefore = position == playbackSourceHelper.getCurrentTrackPosition()
+        if (isRemovedTrackWasPlayingBefore) {
+            val keyBundle = Bundle()
+            keyBundle.putInt(MEDIA_POSITION, 0)
+            controls.playFromMediaId(KIND_NOW_PLAYING, keyBundle)
+            return
+        }
+
+        val isRemovedTrackIsBehindCurrentOne = position < playbackSourceHelper.getCurrentTrackPosition()
+        if (isRemovedTrackIsBehindCurrentOne) {
+            val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
+            playbackSourceHelper.setTrackPosition(currentTrackPosition-1)
         }
     }
 
