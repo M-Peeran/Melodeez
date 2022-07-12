@@ -36,29 +36,36 @@ class PlaylistDetailsDialog(
         binding.apply {
             textAlbum.text = track.album
             textArtist.text = track.artist
+            handleOnAddToQueueClick()
+            handleOnDeleteFromPlaylistClick()
+        }
 
-            textDeleteFromPlaylist.setOnClickListener {
-                dismiss()
-                viewModel.onEvent(Event.DeleteTrackFromPlaylist(playlistId, track.trackId))
-                showToast("Deleted successfully!")
-            }
-
-            textAddToQueue.setOnClickListener {
-                dismiss()
-                viewModel.onEvent(Event.AddToQueue(track))
-            }
-
-            collectWithLifecycle(viewModel.isSuccessful) { isSuccessful ->
-                isSuccessful?.let {
-                    if (it) {
-                        showToast("Added to queue")
-                    } else {
-                        showToast("Failed : queue is empty")
-                    }
+        collectWithLifecycle(viewModel.isSuccessful) { isSuccessful ->
+            isSuccessful?.let {
+                if (it) {
+                    showToast("Added to queue")
+                } else {
+                    showToast("Failed : queue is empty")
                 }
             }
         }
+
         return binding.root
+    }
+
+    private fun PlaylistDetailsDialogBinding.handleOnAddToQueueClick() {
+        textDeleteFromPlaylist.setOnClickListener {
+            viewModel.onEvent(Event.DeleteTrackFromPlaylist(playlistId, track.trackId))
+            showToast("Deleted successfully!")
+            dismiss()
+        }
+    }
+
+    private fun PlaylistDetailsDialogBinding.handleOnDeleteFromPlaylistClick() {
+        textAddToQueue.setOnClickListener {
+            viewModel.onEvent(Event.AddToQueue(track))
+            dismiss()
+        }
     }
 
     override fun onDestroyView() {
