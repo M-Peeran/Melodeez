@@ -42,17 +42,16 @@ class AlbumsFragment : Fragment(), OnItemClickListener<Album> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.bindList()
 
-        adapter = AlbumAdapter(requireContext(), lifecycleScope, this)
-        binding.listAlbums.adapter = adapter
         collectLatestWithLifecycle(viewModel.albums) { albums ->
             if (albums.isNotEmpty()) {
-                binding.progressbar.visibility = View.GONE
+                binding.toggleProgressbarVisibility()
                 adapter?.submitData(albums)
             }
         }
-        // Kick off
-        binding.progressbar.visibility = View.VISIBLE
+
+        binding.toggleProgressbarVisibility(showNow = true)
         viewModel.setStateEvent(Event.Synchronize)
     }
 
@@ -60,6 +59,15 @@ class AlbumsFragment : Fragment(), OnItemClickListener<Album> {
         findNavController().navigate(
             ViewPagerHostFragmentDirections.actionMainFragmentToAlbumDetailsFragment(data.albumId)
         )
+    }
+
+    private fun AlbumsFragmentBinding.bindList() {
+        adapter = AlbumAdapter(requireContext(), lifecycleScope, this@AlbumsFragment)
+        listAlbums.adapter = adapter
+    }
+
+    private fun AlbumsFragmentBinding.toggleProgressbarVisibility(showNow: Boolean = false) {
+        progressbar.visibility = if (showNow) View.VISIBLE else View.GONE
     }
 
     override fun onDestroyView() {
