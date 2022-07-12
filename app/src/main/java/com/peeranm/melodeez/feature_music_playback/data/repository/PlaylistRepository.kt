@@ -1,14 +1,12 @@
 package com.peeranm.melodeez.feature_music_playback.data.repository
 
 import com.peeranm.melodeez.feature_music_playback.model.Playlist
-import com.peeranm.melodeez.feature_music_playback.model.PlaylistTrackCrossRef
 import com.peeranm.melodeez.feature_music_playback.model.PlaylistWithTracks
-import com.peeranm.melodeez.feature_music_playback.model.Track
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistRepository {
 
-    suspend fun insertPlaylist(playlist: Playlist)
+    suspend fun insertPlaylist(playlist: Playlist): Long
 
     suspend fun deletePlaylist(playlistId: Long): Int
 

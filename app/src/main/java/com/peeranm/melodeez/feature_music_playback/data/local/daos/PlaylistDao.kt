@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface PlaylistDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlaylist(playlist: Playlist)
+    suspend fun insertPlaylist(playlist: Playlist): Long
 
     @Query("delete from playlists where playlistId =:playlistId")
     suspend fun deletePlaylist(playlistId: Long): Int

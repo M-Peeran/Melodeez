@@ -4,7 +4,7 @@ data class PlaylistUseCases(
     val getPlaylists: GetPlaylistsUseCase,
     val getPlaylist: GetPlaylistUseCase,
     val getPlaylistsForUi: GetPlaylistsForUiUseCase,
-    val createPlaylist: CreatePlaylistUseCase,
+    val insertPlaylist: InsertPlaylistUseCase,
     val deletePlaylist: DeletePlaylistUseCase,
     val insertTrackToPlaylist: InsertTrackToPlaylistUseCase,
     val insertTracksToPlaylist: InsertTracksToPlaylistUseCase,

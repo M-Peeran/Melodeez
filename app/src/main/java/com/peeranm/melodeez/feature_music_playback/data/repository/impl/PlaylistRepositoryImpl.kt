@@ -13,8 +13,8 @@ import kotlinx.coroutines.withContext
 
 class PlaylistRepositoryImpl(private val database: MusicDatabase) : PlaylistRepository {
 
-    override suspend fun insertPlaylist(playlist: Playlist) {
-        database.playlistDao().insertPlaylist(playlist)
+    override suspend fun insertPlaylist(playlist: Playlist): Long {
+        return database.playlistDao().insertPlaylist(playlist)
     }
 
     override suspend fun deletePlaylist(playlistId: Long): Int {

@@ -15,7 +15,7 @@ class CreatePlaylistViewModel @Inject constructor(
     fun onEvent(event: Event) {
         when (event) {
             is Event.CreatePlaylistWithName -> viewModelScope.launch {
-                playlistUseCases.createPlaylist(event.name)
+                val playlistId = playlistUseCases.insertPlaylist(event.name)
             }
         }
     }
