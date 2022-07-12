@@ -7,9 +7,6 @@ import android.media.MediaPlayer
 import com.peeranm.melodeez.feature_music_playback.data.device_storage.AlbumsSource
 import com.peeranm.melodeez.feature_music_playback.data.device_storage.TracksSource
 import com.peeranm.melodeez.feature_music_playback.data.local.MusicDatabase
-import com.peeranm.melodeez.feature_music_playback.use_cases.track_info_use_cases.GetMetadataUseCase
-import com.peeranm.melodeez.feature_music_playback.use_cases.track_info_use_cases.GetPlaybackStateUseCase
-import com.peeranm.melodeez.feature_music_playback.use_cases.track_info_use_cases.TrackInfoUseCases
 import com.peeranm.melodeez.feature_music_playback.data.repository.impl.PlaylistRepositoryImpl
 import com.peeranm.melodeez.feature_music_playback.use_cases.playlist_use_cases.*
 import com.peeranm.melodeez.feature_music_playback.data.repository.impl.TrackRepositoryImpl
@@ -66,12 +63,6 @@ object AppModule {
         return NotificationHelperImpl(context)
     }
 
-    @Singleton
-    @Provides
-    fun provideControllerCallbackLive(): ControllerCallbackHelper {
-        return ControllerCallbackHelperImpl()
-    }
-
     @Provides
     @Singleton
     fun provideAudioFocusManager(
@@ -85,17 +76,6 @@ object AppModule {
     @Provides
     fun provideRepeatState(): RepeatStateHelper {
         return RepeatStateHelper()
-    }
-
-    @Provides
-    @Singleton
-    fun provideTrackInfoUseCases(
-        controllerCallbackHelper: ControllerCallbackHelper
-    ): TrackInfoUseCases {
-        return TrackInfoUseCases(
-            getPlaybackState = GetPlaybackStateUseCase(controllerCallbackHelper),
-            getMetadata = GetMetadataUseCase(controllerCallbackHelper)
-        )
     }
 
     @Singleton

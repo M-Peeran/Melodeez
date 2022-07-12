@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import coil.imageLoader
@@ -23,7 +22,6 @@ import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.PlayerFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.presentation.now_playing.NowPlayingDialog
-import com.peeranm.melodeez.feature_music_playback.utils.helpers.ControllerCallbackHelper
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.PlaybackHelper
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.RepeatStateHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,7 +32,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PlayerFragment : Fragment() {
 
-    @Inject lateinit var controllerCallbackHelper: ControllerCallbackHelper
     @Inject lateinit var repeatStateHelper: RepeatStateHelper
     @Inject lateinit var playbackHelper: PlaybackHelper
 
@@ -72,9 +69,6 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        collectWithLifecycle(controllerCallbackHelper.state) { it?.let { updateState(it) } }
-        collectWithLifecycle(controllerCallbackHelper.metadata) { it?.let { updateMetadata(it) } }
-
         binding.apply {
             btnPlayPause.setOnClickListener {
                 if (controller.playbackState?.state == PlaybackStateCompat.STATE_PLAYING) {
@@ -90,6 +84,8 @@ class PlayerFragment : Fragment() {
 
             btnNext.setOnClickListener {
                 controller.transportControls.skipToNext()
+                binding.updateState(PlaybackStateCompat.fromPlaybackState(requireActivity().mediaController.playbackState))
+                binding.updateMetadata(MediaMetadataCompat.fromMediaMetadata(requireActivity().mediaController.metadata))
             }
 
             btnPrevious.setOnClickListener {
@@ -120,69 +116,67 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    private fun updateMetadata(metadataCompat: MediaMetadataCompat) {
-        binding.apply {
-            textTitle.text = metadataCompat.getText(MediaMetadata.METADATA_KEY_TITLE)
-            textArtist.text = metadataCompat.getText(MediaMetadata.METADATA_KEY_ARTIST)
-            textAlbum.text = metadataCompat.getText(MediaMetadata.METADATA_KEY_ALBUM)
-            textStartTime.text = getString(R.string.start_time)
-            textEndTime.text = getTimeStamp(metadataCompat.getLong(MediaMetadata.METADATA_KEY_DURATION))
-            val albumArtRef = metadataCompat.getText(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
-            if (albumArtRef != null) {
-                val albumArt = requireContext().getBitmap(
-                    File(requireContext().filesDir, "albumarts"),
-                    albumArtRef.toString()
-                )
-                val imageLoadRequest = requireContext().getImageRequest(albumArtRef.toString(), imageAlbumArt)
-                lifecycleScope.launch { requireContext().imageLoader.execute(imageLoadRequest) }
+    private fun PlayerFragmentBinding.updateMetadata(metadata: MediaMetadataCompat) {
+        textTitle.text = metadata.getText(MediaMetadata.METADATA_KEY_TITLE)
+        textArtist.text = metadata.getText(MediaMetadata.METADATA_KEY_ARTIST)
+        textAlbum.text = metadata.getText(MediaMetadata.METADATA_KEY_ALBUM)
+        textStartTime.text = getString(R.string.start_time)
+        textEndTime.text = getTimeStamp(metadata.getLong(MediaMetadata.METADATA_KEY_DURATION))
+        val albumArtRef = metadata.getText(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
+        if (albumArtRef != null) {
+            val albumArt = requireContext().getBitmap(
+                File(requireContext().filesDir, "albumarts"),
+                albumArtRef.toString()
+            )
+            val imageLoadRequest = requireContext().getImageRequest(albumArtRef.toString(), imageAlbumArt)
+            lifecycleScope.launch { requireContext().imageLoader.execute(imageLoadRequest) }
 
-                Palette.from(albumArt).generate {
-                    val swatch = it?.darkVibrantSwatch ?: it?.darkMutedSwatch ?: it?.mutedSwatch
-                    swatch?.run {
-                        val prevColor = (root.background as ColorDrawable).color
-                        ValueAnimator().apply {
-                            setIntValues(prevColor, rgb)
-                            setEvaluator(ArgbEvaluator())
-                            addUpdateListener {
-                                root.setBackgroundColor(animatedValue as Int)
-                                activity?.run { window.statusBarColor = animatedValue as Int }
-                            }
-                        }.setDuration(1000).start()
-                        textStartTime.setTextColor(titleTextColor)
-                        textEndTime.setTextColor(titleTextColor)
-                        textTitle.setTextColor(bodyTextColor)
-                        textAlbum.setTextColor(titleTextColor)
-                        textArtist.setTextColor(titleTextColor)
-                        seekbarProgress.progressTintList = ColorStateList.valueOf(titleTextColor)
-                    }
+            Palette.from(albumArt).generate {
+                val swatch = it?.darkVibrantSwatch ?: it?.darkMutedSwatch ?: it?.mutedSwatch
+                swatch?.run {
+                    val prevColor = (root.background as ColorDrawable).color
+                    ValueAnimator().apply {
+                        setIntValues(prevColor, rgb)
+                        setEvaluator(ArgbEvaluator())
+                        addUpdateListener {
+                            root.setBackgroundColor(animatedValue as Int)
+                            activity?.run { window.statusBarColor = animatedValue as Int }
+                        }
+                    }.setDuration(1000).start()
+                    textStartTime.setTextColor(titleTextColor)
+                    textEndTime.setTextColor(titleTextColor)
+                    textTitle.setTextColor(bodyTextColor)
+                    textAlbum.setTextColor(titleTextColor)
+                    textArtist.setTextColor(titleTextColor)
+                    seekbarProgress.progressTintList = ColorStateList.valueOf(titleTextColor)
                 }
-            } else {
-                imageAlbumArt.load(R.drawable.album_art_none)
-                seekbarProgress.progressTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.grey_200
-                    )
+            }
+        } else {
+            imageAlbumArt.load(R.drawable.album_art_none)
+            seekbarProgress.progressTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.grey_200
                 )
-                activity?.run {
-                    window.statusBarColor = ContextCompat.getColor(
-                        requireContext(),
-                        R.color.grey_800
-                    )
-                }
-                root.setBackgroundColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.grey_600
-                    )
+            )
+            activity?.run {
+                window.statusBarColor = ContextCompat.getColor(
+                    requireContext(),
+                    R.color.grey_800
                 )
             }
+            root.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.grey_600
+                )
+            )
         }
     }
 
-    private fun updateState(stateCompat: PlaybackStateCompat) {
-        updateProgress(stateCompat.state)
-        when (stateCompat.state) {
+    private fun PlayerFragmentBinding.updateState(state: PlaybackStateCompat) {
+        updateProgress(state.state)
+        when (state.state) {
             PlaybackStateCompat.STATE_PAUSED -> {
                 binding.btnPlayPause.setImageResource(R.drawable.ic_play)
             }
@@ -221,22 +215,20 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    private fun updateProgress(state: Int) {
+    private fun PlayerFragmentBinding.updateProgress(state: Int) {
         when (state) {
             PlaybackStateCompat.STATE_PLAYING -> {
                 cancelProgress()
-                val endTime = controllerCallbackHelper.metadata.value?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: -1L
+                val endTime = -1L // get end time from metadata
                 progressJob = lifecycleScope.launch {
-                    binding.apply {
-                        textEndTime.text = getTimeStamp(endTime)
-                        seekbarProgress.max = endTime.toInt()
-                        while (isActive) {
-                            if (playbackHelper.isPlaying()) {
-                                seekbarProgress.progress = playbackHelper.getPlaybackPosition()
-                                textStartTime.text = getTimeStamp(seekbarProgress.progress.toLong())
-                            } else cancelProgress()
-                            delay(1000L)
-                        }
+                    textEndTime.text = getTimeStamp(endTime)
+                    seekbarProgress.max = endTime.toInt()
+                    while (isActive) {
+                        if (playbackHelper.isPlaying()) {
+                            seekbarProgress.progress = playbackHelper.getPlaybackPosition()
+                            textStartTime.text = getTimeStamp(seekbarProgress.progress.toLong())
+                        } else cancelProgress()
+                        delay(1000L)
                     }
                 }
             }
@@ -247,11 +239,6 @@ class PlayerFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         cancelProgress()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        controllerCallbackHelper.state.value?.let { updateProgress(it.state) }
     }
 
     private fun cancelProgress() {

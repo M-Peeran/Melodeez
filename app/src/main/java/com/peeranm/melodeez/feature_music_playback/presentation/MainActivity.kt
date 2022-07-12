@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.feature_music_playback.utils.helpers.ControllerCallbackHelper
 import com.peeranm.melodeez.feature_music_playback.utils.PlaybackService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -14,7 +13,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject lateinit var controllerCallbackHelper: ControllerCallbackHelper
     private var mediaBrowser: MediaBrowserCompat? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +39,6 @@ class MainActivity : AppCompatActivity() {
                         this@MainActivity,
                         MediaControllerCompat(this@MainActivity, it.sessionToken)
                     )
-                    val controller = MediaControllerCompat.getMediaController(this@MainActivity)
-                    controller.registerCallback(controllerCallbackHelper as MediaControllerCompat.Callback)
                 }
             }
         }
@@ -50,8 +46,6 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onDestroy() {
         super.onDestroy()
-        MediaControllerCompat.getMediaController(this@MainActivity)
-            .unregisterCallback(controllerCallbackHelper as MediaControllerCompat.Callback)
         mediaBrowser?.disconnect()
         mediaBrowser = null
     }

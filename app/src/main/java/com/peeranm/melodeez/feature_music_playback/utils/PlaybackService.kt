@@ -130,12 +130,15 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         val position = playbackSourceHelper.getCurrentTrackPosition()
 
                         if (position+1 < tracks.size) {
-                            val track = tracks[position+1]
-                            val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
-                            val metadata = getMetadataBuilder(track).build()
+                            var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT).build()
+                            mediaSession.setPlaybackState(playbackState)
 
+                            val track = tracks[position+1]
+                            val metadata = getMetadataBuilder(track).build()
                             mediaSession.setMetadata(metadata)
+
                             playbackHelper.playTrack(track.uri.toUri())
+                            playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
                             mediaSession.setPlaybackState(playbackState)
 
                             startService(Intent(baseContext, PlaybackService::class.java))
@@ -164,12 +167,15 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         val position = playbackSourceHelper.getCurrentTrackPosition()
 
                         if (position-1 >= 0) {
-                            val track = tracks[position-1]
-                            val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
-                            val metadata = getMetadataBuilder(track).build()
+                            var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS).build()
+                            mediaSession.setPlaybackState(playbackState)
 
+                            val track = tracks[position-1]
+                            val metadata = getMetadataBuilder(track).build()
                             mediaSession.setMetadata(metadata)
+
                             playbackHelper.playTrack(track.uri.toUri())
+                            playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
                             mediaSession.setPlaybackState(playbackState)
 
                             startService(Intent(baseContext, PlaybackService::class.java))
@@ -278,7 +284,13 @@ class PlaybackService : MediaBrowserServiceCompat(),
             PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
             PlaybackStateCompat.ACTION_SEEK_TO or
             PlaybackStateCompat.ACTION_STOP
-        ).setState(state, playbackHelper.getPlaybackPosition().toLong(), 1f)
+        ).also {
+            when (state) {
+                PlaybackStateCompat.STATE_SKIPPING_TO_NEXT -> it.setState(state, 0, 1f)
+                PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS -> it.setState(state, 0, 1f)
+                else -> it.setState(state, playbackHelper.getPlaybackPosition().toLong(), 1f)
+            }
+        }
     }
 
     override fun onCreate() {
