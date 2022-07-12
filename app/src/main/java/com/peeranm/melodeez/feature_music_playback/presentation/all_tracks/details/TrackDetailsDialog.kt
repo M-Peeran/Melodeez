@@ -49,7 +49,7 @@ class TrackDetailsDialog(private val track: Track) : DialogFragment() {
     }
 
     private fun TrackDetailsDialogBinding.handleOnAddQueueClick() {
-        textAddToPlaylist.setOnClickListener {
+        textAddToQueue.setOnClickListener {
             val tracks = playbackSourceHelper.getCurrentSource()
             if (tracks.isEmpty()) {
                 showToast("Failed: Queue is empty!")
