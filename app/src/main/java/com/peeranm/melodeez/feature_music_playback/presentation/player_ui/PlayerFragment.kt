@@ -24,6 +24,7 @@ import com.peeranm.melodeez.databinding.PlayerFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.presentation.now_playing.NowPlayingDialog
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.PlaybackHelper
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.RepeatStateHelper
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.TrackInfo
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.io.File
@@ -32,6 +33,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PlayerFragment : Fragment() {
 
+    @Inject lateinit var trackInfo: TrackInfo
     @Inject lateinit var repeatStateHelper: RepeatStateHelper
     @Inject lateinit var playbackHelper: PlaybackHelper
 
@@ -84,8 +86,6 @@ class PlayerFragment : Fragment() {
 
             btnNext.setOnClickListener {
                 controller.transportControls.skipToNext()
-                binding.updateState(PlaybackStateCompat.fromPlaybackState(requireActivity().mediaController.playbackState))
-                binding.updateMetadata(MediaMetadataCompat.fromMediaMetadata(requireActivity().mediaController.metadata))
             }
 
             btnPrevious.setOnClickListener {
@@ -96,6 +96,14 @@ class PlayerFragment : Fragment() {
             }
             seekbarProgress.setOnSeekBarChangeListener(seekBarChangeListener)
             setProperStateImage()
+        }
+
+        collectWithLifecycle(trackInfo.stateAsFlow) { state ->
+            state?.let { binding.updateState(it) }
+        }
+
+        collectWithLifecycle(trackInfo.metadataAsFlow) { metadata ->
+            metadata?.let { binding.updateMetadata(it) }
         }
     }
 
@@ -219,7 +227,7 @@ class PlayerFragment : Fragment() {
         when (state) {
             PlaybackStateCompat.STATE_PLAYING -> {
                 cancelProgress()
-                val endTime = -1L // get end time from metadata
+                val endTime = trackInfo.metadataAsFlow.value?.getLong(MediaMetadata.METADATA_KEY_DURATION)!!
                 progressJob = lifecycleScope.launch {
                     textEndTime.text = getTimeStamp(endTime)
                     seekbarProgress.max = endTime.toInt()

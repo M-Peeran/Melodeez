@@ -42,6 +42,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
     @Inject lateinit var artistUseCases: ArtistUseCases
     @Inject lateinit var playlistUseCases: PlaylistUseCases
     @Inject lateinit var playbackHelper: PlaybackHelper
+    @Inject lateinit var trackInfo: TrackInfo
 
     private lateinit var mediaSession: MediaSessionCompat
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -61,8 +62,10 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         val metadata = getMetadataBuilder(track).build()
 
                         mediaSession.setMetadata(metadata)
+                        trackInfo.updateMetadata(metadata)
                         playbackHelper.playTrack(track.uri.toUri())
                         mediaSession.setPlaybackState(playbackState)
+                        trackInfo.updateState(playbackState)
 
                         notificationHelper.registerReceiver()
                         playbackSourceHelper.setSourceKind(mediaId!!)
@@ -87,6 +90,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
             playbackHelper.resumePlayback()
             val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
             mediaSession.setPlaybackState(playbackState)
+            trackInfo.updateState(playbackState)
             startForeground(
                 NOTIFICATION_ID,
                 notificationHelper.getNotification(
@@ -101,6 +105,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
             playbackHelper.pausePlayback()
             val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PAUSED).build()
             mediaSession.setPlaybackState(playbackState)
+            trackInfo.updateState(playbackState)
             startForeground(
                 NOTIFICATION_ID,
                 notificationHelper.getNotification(
@@ -115,6 +120,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
             playbackHelper.stopPlayback()
             val playbackState = getStateBuilder(PlaybackStateCompat.STATE_STOPPED).build()
             mediaSession.setPlaybackState(playbackState)
+            trackInfo.updateState(playbackState)
             notificationHelper.unregisterReceiver()
             mediaSession.isActive = false
             stopSelf()
@@ -132,14 +138,17 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         if (position+1 < tracks.size) {
                             var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT).build()
                             mediaSession.setPlaybackState(playbackState)
+                            trackInfo.updateState(playbackState)
 
                             val track = tracks[position+1]
                             val metadata = getMetadataBuilder(track).build()
                             mediaSession.setMetadata(metadata)
+                            trackInfo.updateMetadata(metadata)
 
                             playbackHelper.playTrack(track.uri.toUri())
                             playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
                             mediaSession.setPlaybackState(playbackState)
+                            trackInfo.updateState(playbackState)
 
                             startService(Intent(baseContext, PlaybackService::class.java))
                             startForeground(
@@ -169,14 +178,17 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         if (position-1 >= 0) {
                             var playbackState = getStateBuilder(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS).build()
                             mediaSession.setPlaybackState(playbackState)
+                            trackInfo.updateState(playbackState)
 
                             val track = tracks[position-1]
                             val metadata = getMetadataBuilder(track).build()
                             mediaSession.setMetadata(metadata)
+                            trackInfo.updateMetadata(metadata)
 
                             playbackHelper.playTrack(track.uri.toUri())
                             playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
                             mediaSession.setPlaybackState(playbackState)
+                            trackInfo.updateState(playbackState)
 
                             startService(Intent(baseContext, PlaybackService::class.java))
                             startForeground(
@@ -202,9 +214,11 @@ class PlaybackService : MediaBrowserServiceCompat(),
             if (playbackHelper.isPlaying()) {
                 val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
                 mediaSession.setPlaybackState(playbackState)
+                trackInfo.updateState(playbackState)
             } else {
                 val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PAUSED).build()
                 mediaSession.setPlaybackState(playbackState)
+                trackInfo.updateState(playbackState)
             }
         }
     }
@@ -233,6 +247,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
                     Toast.makeText(baseContext, "Queue ended", Toast.LENGTH_SHORT).show()
                     val playbackState = getStateBuilder(PlaybackStateCompat.STATE_NONE).build()
                     mediaSession.setPlaybackState(playbackState)
+                    trackInfo.updateState(playbackState)
                 } else mediaSession.controller.transportControls.skipToNext()
             }
 

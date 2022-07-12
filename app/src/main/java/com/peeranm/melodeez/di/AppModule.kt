@@ -218,4 +218,8 @@ object AppModule {
         )
     }
 
+    @Singleton
+    @Provides
+    fun provideTrackInfo() = TrackInfo()
+
 }

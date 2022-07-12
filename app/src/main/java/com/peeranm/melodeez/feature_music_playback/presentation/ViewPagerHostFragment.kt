@@ -14,16 +14,20 @@ import coil.imageLoader
 import coil.load
 import com.google.android.material.tabs.TabLayoutMediator
 import com.peeranm.melodeez.R
+import com.peeranm.melodeez.core.collectWithLifecycle
 import com.peeranm.melodeez.core.getImageRequest
 import com.peeranm.melodeez.core.tabArray
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.FragStateAdapter
 import com.peeranm.melodeez.databinding.ViewPagerHostFragmentBinding
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.TrackInfo
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ViewPagerHostFragment : Fragment() {
 
+    @Inject lateinit var trackInfo: TrackInfo
     private var _binding: ViewPagerHostFragmentBinding? = null
     private val binding: ViewPagerHostFragmentBinding
     get() = _binding!!
@@ -74,6 +78,14 @@ class ViewPagerHostFragment : Fragment() {
                     ViewPagerHostFragmentDirections.actionMainFragmentToPlayerFragment()
                 )
             }
+        }
+
+        collectWithLifecycle(trackInfo.stateAsFlow) {
+            binding.updateState(it)
+        }
+
+        collectWithLifecycle(trackInfo.metadataAsFlow) {
+            binding.updateMetadata(it)
         }
     }
 
