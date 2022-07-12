@@ -8,15 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.peeranm.melodeez.core.utils.*
+import com.peeranm.melodeez.core.collectLatestWithLifecycle
 import com.peeranm.melodeez.databinding.AlbumsFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Album
 import com.peeranm.melodeez.feature_music_playback.presentation.ViewPagerHostFragmentDirections
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.AlbumAdapter
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
-import com.peeranm.melodeez.feature_music_playback.utils.collectLatestWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.collectWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

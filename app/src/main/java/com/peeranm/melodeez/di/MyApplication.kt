@@ -1,4 +1,4 @@
-package com.peeranm.melodeez.core.di
+package com.peeranm.melodeez.di
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

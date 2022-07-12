@@ -12,7 +12,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.utils.*
+import com.peeranm.melodeez.core.KIND_ARTIST
+import com.peeranm.melodeez.core.MEDIA_KEY
+import com.peeranm.melodeez.core.MEDIA_POSITION
 import com.peeranm.melodeez.databinding.ArtistDetailsFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.all_tracks.details.TrackDetailsDialog

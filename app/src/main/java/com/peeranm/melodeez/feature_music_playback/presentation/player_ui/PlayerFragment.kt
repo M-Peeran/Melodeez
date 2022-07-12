@@ -13,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,14 +20,9 @@ import androidx.palette.graphics.Palette
 import coil.imageLoader
 import coil.load
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.utils.RepeatState
-import com.peeranm.melodeez.core.utils.getBitmap
-import com.peeranm.melodeez.core.utils.getTimeStamp
+import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.PlayerFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.presentation.now_playing.NowPlayingDialog
-import com.peeranm.melodeez.feature_music_playback.utils.collectWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.getImageRequest
-import com.peeranm.melodeez.feature_music_playback.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.io.File

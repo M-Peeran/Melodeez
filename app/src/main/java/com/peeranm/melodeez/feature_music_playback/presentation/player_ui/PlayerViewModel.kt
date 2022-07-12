@@ -3,7 +3,7 @@ package com.peeranm.melodeez.feature_music_playback.presentation.player_ui
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.ViewModel
-import com.peeranm.melodeez.core.utils.RepeatState
+import com.peeranm.melodeez.core.RepeatState
 import com.peeranm.melodeez.feature_music_playback.use_cases.media_player_use_cases.MediaPlayerUseCases
 import com.peeranm.melodeez.feature_music_playback.use_cases.playback_use_cases.PlaybackUseCases
 import com.peeranm.melodeez.feature_music_playback.use_cases.track_info_use_cases.TrackInfoUseCases

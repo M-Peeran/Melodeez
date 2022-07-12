@@ -1,4 +1,4 @@
-package com.peeranm.melodeez.core.di
+package com.peeranm.melodeez.di
 
 import android.content.Context
 import android.media.AudioAttributes

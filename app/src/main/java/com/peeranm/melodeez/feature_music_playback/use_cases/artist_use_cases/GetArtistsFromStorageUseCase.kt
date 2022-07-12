@@ -2,7 +2,7 @@ package com.peeranm.melodeez.feature_music_playback.use_cases.artist_use_cases
 
 import android.content.Context
 import android.provider.MediaStore
-import com.peeranm.melodeez.core.utils.UNKNOWN_ARTIST
+import com.peeranm.melodeez.core.UNKNOWN_ARTIST
 import com.peeranm.melodeez.feature_music_playback.model.Artist
 
 class GetArtistsFromStorageUseCase(private val context: Context) {

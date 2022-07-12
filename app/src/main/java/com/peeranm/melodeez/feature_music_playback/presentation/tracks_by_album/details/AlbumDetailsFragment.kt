@@ -18,14 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import coil.imageLoader
 import coil.load
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.utils.*
+import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.AlbumDetailsFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.all_tracks.details.TrackDetailsDialog
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.SimpleTrackAdapter
-import com.peeranm.melodeez.feature_music_playback.utils.getImageRequest
-import com.peeranm.melodeez.feature_music_playback.utils.getReleaseYearString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

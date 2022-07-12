@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.peeranm.melodeez.core.utils.DATABASE_NAME
+import com.peeranm.melodeez.core.DATABASE_NAME
 import com.peeranm.melodeez.feature_music_playback.data.local.daos.AlbumDao
 import com.peeranm.melodeez.feature_music_playback.data.local.daos.ArtistDao
 import com.peeranm.melodeez.feature_music_playback.data.local.daos.PlaylistDao

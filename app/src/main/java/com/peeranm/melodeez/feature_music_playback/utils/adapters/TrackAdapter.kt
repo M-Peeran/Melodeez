@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.imageLoader
 import coil.load
 import com.peeranm.melodeez.R
+import com.peeranm.melodeez.core.getImageRequest
 import com.peeranm.melodeez.databinding.TracksListItemBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
-import com.peeranm.melodeez.feature_music_playback.utils.getImageRequest
 import kotlinx.coroutines.launch
 
 class TrackAdapter(

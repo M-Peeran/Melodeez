@@ -2,9 +2,8 @@ package com.peeranm.melodeez.feature_music_playback.data.device_storage
 
 import android.content.Context
 import android.provider.MediaStore
-import com.peeranm.melodeez.core.utils.UNKNOWN_ALBUM
+import com.peeranm.melodeez.core.UNKNOWN_ALBUM
 import com.peeranm.melodeez.feature_music_playback.model.Album
-import com.peeranm.melodeez.feature_music_playback.model.Track
 import java.io.File
 
 class AlbumsSource {

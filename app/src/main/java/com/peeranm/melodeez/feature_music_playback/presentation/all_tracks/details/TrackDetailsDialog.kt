@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import com.peeranm.melodeez.core.collectWithLifecycle
+import com.peeranm.melodeez.core.showToast
 import com.peeranm.melodeez.databinding.TrackDetailsDialogBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_playlist.details.select_playlist_dialog.SelectPlaylistDialog
-import com.peeranm.melodeez.feature_music_playback.utils.collectWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

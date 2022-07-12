@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.utils.ITEM_TYPE_CREATE_NEW_PLAYLIST
-import com.peeranm.melodeez.core.utils.ITEM_TYPE_PLAYLIST
+import com.peeranm.melodeez.core.ITEM_TYPE_CREATE_NEW_PLAYLIST
+import com.peeranm.melodeez.core.ITEM_TYPE_PLAYLIST
 import com.peeranm.melodeez.databinding.CreateNewPlaylistItemBinding
 import com.peeranm.melodeez.databinding.PlaylistItemBinding
 import com.peeranm.melodeez.feature_music_playback.model.Playlist

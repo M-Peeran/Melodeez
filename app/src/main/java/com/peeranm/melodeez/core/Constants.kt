@@ -1,4 +1,4 @@
-package com.peeranm.melodeez.core.utils
+package com.peeranm.melodeez.core
 
 const val ACTIVITY_TAG = "MainActivity"
 const val DATABASE_NAME = "melodeez_db"

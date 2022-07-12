@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.utils.*
+import com.peeranm.melodeez.core.KIND_TRACKS_COLLECTION
+import com.peeranm.melodeez.core.MEDIA_POSITION
+import com.peeranm.melodeez.core.collectLatestWithLifecycle
+import com.peeranm.melodeez.core.showToast
 import com.peeranm.melodeez.databinding.AllTracksFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.Event
@@ -23,8 +26,6 @@ import com.peeranm.melodeez.feature_music_playback.presentation.ViewPagerHostFra
 import com.peeranm.melodeez.feature_music_playback.presentation.all_tracks.details.TrackDetailsDialog
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.TrackAdapter
-import com.peeranm.melodeez.feature_music_playback.utils.collectLatestWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.showToast
 
 @AndroidEntryPoint
 class AllTracksFragment : Fragment(), OnItemClickListener<Track> {

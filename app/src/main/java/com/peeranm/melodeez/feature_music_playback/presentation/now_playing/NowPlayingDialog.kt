@@ -10,15 +10,15 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.utils.KIND_NOW_PLAYING
-import com.peeranm.melodeez.core.utils.MEDIA_POSITION
+import com.peeranm.melodeez.core.KIND_NOW_PLAYING
+import com.peeranm.melodeez.core.MEDIA_POSITION
+import com.peeranm.melodeez.core.collectWithLifecycle
+import com.peeranm.melodeez.core.showToast
 import com.peeranm.melodeez.databinding.NowPlayingDialogBinding
 import com.peeranm.melodeez.feature_music_playback.data.device_storage.SourceAction
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.NowPlayingAdapter
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
-import com.peeranm.melodeez.feature_music_playback.utils.collectWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

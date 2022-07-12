@@ -14,14 +14,13 @@ import coil.imageLoader
 import coil.load
 import com.google.android.material.tabs.TabLayoutMediator
 import com.peeranm.melodeez.R
+import com.peeranm.melodeez.core.collectWithLifecycle
+import com.peeranm.melodeez.core.getImageRequest
+import com.peeranm.melodeez.core.tabArray
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.FragStateAdapter
-import com.peeranm.melodeez.core.utils.tabArray
 import com.peeranm.melodeez.databinding.ViewPagerHostFragmentBinding
-import com.peeranm.melodeez.feature_music_playback.utils.collectWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.getImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.io.File
 
 @AndroidEntryPoint
 class ViewPagerHostFragment : Fragment() {

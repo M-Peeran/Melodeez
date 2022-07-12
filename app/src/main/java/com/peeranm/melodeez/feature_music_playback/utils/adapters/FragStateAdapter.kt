@@ -3,7 +3,7 @@ package com.peeranm.melodeez.feature_music_playback.utils.adapters
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.peeranm.melodeez.core.utils.NO_OF_TABS
+import com.peeranm.melodeez.core.NO_OF_TABS
 import com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_album.AlbumsFragment
 import com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_artist.ArtistsFragment
 import com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_playlist.PlaylistsFragment

@@ -11,15 +11,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.utils.ITEM_TYPE_CREATE_NEW_PLAYLIST
+import com.peeranm.melodeez.core.ITEM_TYPE_CREATE_NEW_PLAYLIST
+import com.peeranm.melodeez.core.collectWithLifecycle
+import com.peeranm.melodeez.core.showToast
 import com.peeranm.melodeez.databinding.PlaylistsFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Playlist
 import com.peeranm.melodeez.feature_music_playback.presentation.ViewPagerHostFragmentDirections
 import com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_playlist.create_new.CreatePlaylistDialog
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.PlaylistAdapter
-import com.peeranm.melodeez.feature_music_playback.utils.collectWithLifecycle
-import com.peeranm.melodeez.feature_music_playback.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
