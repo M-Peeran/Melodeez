@@ -37,24 +37,21 @@ class SelectPlaylistDialog(private val track: Track) : DialogFragment(), OnCheck
 
     private fun getDialogView(): View {
         _binding = SelectPlaylistDialogBinding.inflate(layoutInflater)
-        adapter = SelectPlaylistAdapter(this)
-        binding.listPlaylists.adapter = adapter
-        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.listPlaylists.layoutManager = layoutManager
-        binding.listPlaylists.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+        binding.bindList()
+
+        collectWithLifecycle(viewModel.playlists) { playlists ->
+            playlists ?: return@collectWithLifecycle
+            if (playlists.isEmpty()) {
+                showToast("No playlists available, create one!")
+                dismiss()
+            } else adapter?.submitData(playlists)
+        }
+
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        collectWithLifecycle(viewModel.playlists) {
-            if (it != null) {
-                if (it.isEmpty()) {
-                    dismiss()
-                    showToast("No playlists available, create one!")
-                } else adapter?.submitData(it)
-            }
-        }
         viewModel.onEvent(Event.GetPlaylists)
     }
 
@@ -65,10 +62,18 @@ class SelectPlaylistDialog(private val track: Track) : DialogFragment(), OnCheck
         position: Int
     ) {
         if (isSelected) {
-            dismiss()
             viewModel.onEvent(Event.InsertTrackToPlaylist(data.playlistId, track.trackId))
             showToast("Added ${track.title} to ${data.name} successfully!")
+            dismiss()
         }
+    }
+
+    private fun SelectPlaylistDialogBinding.bindList() {
+        adapter = SelectPlaylistAdapter(this@SelectPlaylistDialog)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listPlaylists.adapter = adapter
+        listPlaylists.layoutManager = layoutManager
+        listPlaylists.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
     }
 
     override fun onDestroyView() {
