@@ -30,30 +30,39 @@ class TrackDetailsDialog(private val track: Track) : DialogFragment() {
 
     private fun getDialogView(): View {
         _binding = TrackDetailsDialogBinding.inflate(layoutInflater)
-
-        binding.apply {
-            textAlbum.text = track.album
-            textArtist.text = track.artist
-
-            textAddToPlaylist.setOnClickListener {
-                SelectPlaylistDialog.getInstance(track).show(childFragmentManager, "ADD_TO_PLAYLIST")
-            }
-
-            textAddToQueue.setOnClickListener {
-                dismiss()
-                val tracks = playbackSourceHelper.getCurrentSource()
-                val isNotEmpty = (tracks.isNotEmpty())
-                val trackNotExists = !tracks.contains(track)
-                if (isNotEmpty && trackNotExists) {
-                    (tracks as MutableList).add(track)
-                    playbackSourceHelper.setCurrentSource(tracks)
-                    showToast("Added to queue")
-                    return@setOnClickListener
-                }
-                showToast("Failed : queue is empty")
-            }
-        }
+        binding.bindTrack()
+        binding.handleOnAddPlaylistClick()
+        binding.handleOnAddQueueClick()
         return binding.root
+    }
+
+    private fun TrackDetailsDialogBinding.bindTrack() {
+        textAlbum.text = track.album
+        textArtist.text = track.artist
+    }
+
+
+    private fun TrackDetailsDialogBinding.handleOnAddPlaylistClick() {
+        textAddToPlaylist.setOnClickListener {
+            SelectPlaylistDialog.getInstance(track).show(childFragmentManager, "ADD_TO_PLAYLIST")
+        }
+    }
+
+    private fun TrackDetailsDialogBinding.handleOnAddQueueClick() {
+        textAddToPlaylist.setOnClickListener {
+            val tracks = playbackSourceHelper.getCurrentSource()
+            if (tracks.isEmpty()) {
+                showToast("Failed: Queue is empty!")
+                return@setOnClickListener
+            }
+            if (tracks.contains(track)) {
+               showToast("Already added!")
+                return@setOnClickListener
+            }
+            (tracks as MutableList).add(track)
+            playbackSourceHelper.setCurrentSource(tracks)
+            showToast("Added to queue!")
+        }
     }
 
     override fun onDestroyView() {
