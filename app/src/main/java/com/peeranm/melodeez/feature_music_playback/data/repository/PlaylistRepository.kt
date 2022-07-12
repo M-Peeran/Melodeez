@@ -26,7 +26,5 @@ interface PlaylistRepository {
 
     fun getPlaylistsAsFlow(): Flow<List<Playlist>>
 
-    suspend fun insertTracksToLastCreatedPlaylist(trackIds: List<Long>)
-
     suspend fun insertTracksToPlaylist(tracksIds: List<Long>, playlistId: Long)
 }

@@ -32,8 +32,6 @@ class AddTracksViewModel @Inject constructor(
                     val trackIds = selectedTracks.keys.toList()
                     if (playlist != null && event.playlistId != null) {
                         playlistUseCases.insertTracksToPlaylist(trackIds, event.playlistId)
-                    } else {
-                        playlistUseCases.insertTracksToLastCreatedPlaylist(trackIds)
                     }
                 }
             }

@@ -101,23 +101,4 @@ class PlaylistRepositoryImpl(private val database: MusicDatabase) : PlaylistRepo
             }
         }
     }
-
-    override suspend fun insertTracksToLastCreatedPlaylist(trackIds: List<Long>) {
-        withContext(Dispatchers.IO) {
-            database.withTransaction {
-                val playlistId = database.playlistDao().getLastCreatedPlaylistId()
-                val playlist = database.playlistDao().getPlaylist(playlistId ?: -1)
-
-                if (playlistId != null && playlist != null) {
-                    trackIds.forEach { trackId ->
-                        val trackRef = PlaylistTrackCrossRef(playlistId, trackId)
-                        database.playlistDao().insertTrackToPlaylist(trackRef)
-                    }
-                    // Update no of tracks after inserting them to playlist
-                    val noOfTracks = database.playlistDao().getPlaylistWithTracks(playlistId).tracks.size
-                    database.playlistDao().insertPlaylist(playlist.copy(noOfTracks = noOfTracks))
-                }
-            }
-        }
-    }
 }

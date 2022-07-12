@@ -89,26 +89,16 @@ object AppModule {
     @Provides
     fun providePlaylistUseCases(database: MusicDatabase): PlaylistUseCases {
         val playlistRepository = PlaylistRepositoryImpl(database)
-        val getPlaylist = GetPlaylistUseCase(playlistRepository)
-        val getPlaylists = GetPlaylistsUseCase(playlistRepository)
-        val getPlaylistsForUi = GetPlaylistsForUiUseCase(playlistRepository)
-        val insertPlaylist = CreatePlaylistUseCase(playlistRepository)
-        val deletePlaylist = DeletePlaylistUseCase(playlistRepository)
-        val insertTrackToPlaylist = InsertTrackToPlaylistUseCase(playlistRepository)
-        val insertTracksToPlaylist = InsertTracksToPlaylistUseCase(playlistRepository)
-        val getPlaylistWithTracks = GetPlaylistWithTracksUseCase(playlistRepository)
-        val deleteTrackFromPlaylist = DeleteTrackFromPlaylistUseCase(playlistRepository,)
         return PlaylistUseCases(
-            getPlaylists = getPlaylists,
-            getPlaylist = getPlaylist,
-            getPlaylistsForUi = getPlaylistsForUi,
-            createPlaylist = insertPlaylist,
-            deletePlaylist = deletePlaylist,
-            insertTrackToPlaylist = insertTrackToPlaylist,
-            insertTracksToPlaylist = insertTracksToPlaylist,
-            insertTracksToLastCreatedPlaylist = InsertTracksToLastCreatedPlaylistUseCase(playlistRepository),
-            deleteTrackFromPlaylist = deleteTrackFromPlaylist,
-            getPlaylistWithTracks = getPlaylistWithTracks
+            getPlaylists = GetPlaylistsUseCase(playlistRepository),
+            getPlaylist = GetPlaylistUseCase(playlistRepository),
+            getPlaylistsForUi = GetPlaylistsForUiUseCase(playlistRepository),
+            createPlaylist = CreatePlaylistUseCase(playlistRepository),
+            deletePlaylist = DeletePlaylistUseCase(playlistRepository),
+            insertTrackToPlaylist = InsertTrackToPlaylistUseCase(playlistRepository),
+            insertTracksToPlaylist = InsertTracksToPlaylistUseCase(playlistRepository),
+            deleteTrackFromPlaylist = DeleteTrackFromPlaylistUseCase(playlistRepository),
+            getPlaylistWithTracks = GetPlaylistWithTracksUseCase(playlistRepository)
         )
     }
 
