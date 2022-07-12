@@ -50,30 +50,11 @@ class AddTracksFragment : Fragment(), OnCheckChangeListener<Track> {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            adapter = SelectableTrackAdapter(requireContext(), this@AddTracksFragment)
-            findNavController().let { navController ->
-                val appConfig = AppBarConfiguration(navController.graph)
-                (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-                toolbar.setupWithNavController(navController, appConfig)
-                toolbar.setNavigationOnClickListener { navController.navigateUp() }
-            }
-            toolbar.title = "Select Tracks"
-            listTracks.adapter = adapter
-            val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            listTracks.layoutManager = layoutManager
-            listTracks.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
-            binding.progressBar.visibility = View.VISIBLE
-
-            btnAddSelected.setOnClickListener {
-                viewModel.onEvent(Event.AddSelectedTracksToPlaylist(args.playlistId))
-                showToast("Added successfully")
-                findNavController().navigateUp()
-            }
-
-            btnCancel.setOnClickListener {
-                viewModel.onEvent(Event.Clear)
-                findNavController().navigateUp()
-            }
+            setupToolbar()
+            bindList()
+            toggleProgressbarVisibility(true)
+            handleOnBtnAddSelectedClick()
+            handleOnBtnCancelClick()
         }
 
         collectWithLifecycle(viewModel.isAnyTrackSelected) {
@@ -81,11 +62,46 @@ class AddTracksFragment : Fragment(), OnCheckChangeListener<Track> {
         }
 
         collectWithLifecycle(viewModel.tracksState) { tracks ->
-            if (tracks.isNotEmpty()) {
-                binding.progressBar.visibility = View.GONE
-                adapter?.submitData(tracks)
-            }
+            binding.toggleProgressbarVisibility()
+            if (tracks.isNotEmpty()) adapter?.submitData(tracks)
         }
+    }
+
+    private fun AddTracksFragmentBinding.handleOnBtnAddSelectedClick() {
+        btnAddSelected.setOnClickListener {
+            viewModel.onEvent(Event.AddSelectedTracksToPlaylist(args.playlistId))
+            showToast("Added successfully")
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun AddTracksFragmentBinding.handleOnBtnCancelClick() {
+        btnCancel.setOnClickListener {
+            viewModel.onEvent(Event.Clear)
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun AddTracksFragmentBinding.bindList() {
+        adapter = SelectableTrackAdapter(requireContext(), this@AddTracksFragment)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listTracks.adapter = adapter
+        listTracks.layoutManager = layoutManager
+        listTracks.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+    }
+
+    private fun AddTracksFragmentBinding.setupToolbar() {
+        findNavController().let { navController ->
+            val appConfig = AppBarConfiguration(navController.graph)
+            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setupWithNavController(navController, appConfig)
+            toolbar.setNavigationOnClickListener { navController.navigateUp() }
+        }
+        toolbar.title = "Select Tracks"
+    }
+
+    private fun AddTracksFragmentBinding.toggleProgressbarVisibility(showNow: Boolean = false) {
+        progressBar.visibility = if (showNow) View.VISIBLE else View.GONE
     }
 
     override fun onCheckChange(
