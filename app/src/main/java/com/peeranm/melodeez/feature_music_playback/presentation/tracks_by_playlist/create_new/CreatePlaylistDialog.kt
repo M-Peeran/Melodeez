@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.peeranm.melodeez.core.collectWithLifecycle
 import com.peeranm.melodeez.databinding.CreatePlaylistDialogBinding
 import com.peeranm.melodeez.feature_music_playback.presentation.ViewPagerHostFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,11 +45,7 @@ class CreatePlaylistDialog : DialogFragment() {
 
         positiveButton.setOnClickListener {
             if (enteredText.isNotEmpty() && enteredText.isNotBlank()) {
-                dismiss()
-                viewModel.onEvent(Event.CreatePlaylistWithName(enteredText))
-                findNavController().navigate(
-                    ViewPagerHostFragmentDirections.actionMainFragmentToAddTracksFragment(-1L)
-                )
+                viewModel.onEvent(Event.CreatePlaylist(enteredText))
             } else binding.etextEnterTitle.error = "Name cannot be empty!"
         }
 
@@ -57,6 +54,19 @@ class CreatePlaylistDialog : DialogFragment() {
 
     private fun getDialogView(): View {
         _binding = CreatePlaylistDialogBinding.inflate(layoutInflater)
+
+        collectWithLifecycle(viewModel.uiAction) { uiAction ->
+            when (uiAction) {
+                is UiAction.NavigateWithPlaylistId -> {
+                    dismiss()
+                    findNavController().navigate(
+                        ViewPagerHostFragmentDirections.actionMainFragmentToAddTracksFragment(uiAction.playlistId)
+                    )
+                }
+                else -> Unit
+            }
+        }
+
         return binding.root
     }
 

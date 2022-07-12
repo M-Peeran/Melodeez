@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peeranm.melodeez.feature_music_playback.use_cases.playlist_use_cases.PlaylistUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -12,10 +14,14 @@ class CreatePlaylistViewModel @Inject constructor(
     private val playlistUseCases: PlaylistUseCases
 ) : ViewModel() {
 
+    private val _uiAction = MutableStateFlow<UiAction>(UiAction.None)
+    val uiAction = _uiAction.asStateFlow()
+
     fun onEvent(event: Event) {
         when (event) {
-            is Event.CreatePlaylistWithName -> viewModelScope.launch {
+            is Event.CreatePlaylist -> viewModelScope.launch {
                 val playlistId = playlistUseCases.insertPlaylist(event.name)
+                _uiAction.value = UiAction.NavigateWithPlaylistId(playlistId)
             }
         }
     }

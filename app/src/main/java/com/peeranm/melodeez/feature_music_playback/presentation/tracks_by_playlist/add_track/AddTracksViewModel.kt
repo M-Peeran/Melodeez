@@ -26,14 +26,9 @@ class AddTracksViewModel @Inject constructor(
 
     fun onEvent(event: Event) {
         when (event) {
-            is Event.AddSelectedTracksToPlaylist -> {
-                viewModelScope.launch {
-                    val playlist = playlistUseCases.getPlaylist(event.playlistId ?: -1)
-                    val trackIds = selectedTracks.keys.toList()
-                    if (playlist != null && event.playlistId != null) {
-                        playlistUseCases.insertTracksToPlaylist(trackIds, event.playlistId)
-                    }
-                }
+            is Event.AddSelectedTracksToPlaylist -> viewModelScope.launch {
+                val trackIds = selectedTracks.keys.toList()
+                playlistUseCases.insertTracksToPlaylist(trackIds, event.playlistId)
             }
 
             is Event.ToggleTrackSelection -> {
