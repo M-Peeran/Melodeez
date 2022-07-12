@@ -23,20 +23,25 @@ import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.PlayerFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.presentation.now_playing.NowPlayingDialog
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.ControllerCallbackHelper
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.PlaybackHelper
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.RepeatStateHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.io.File
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PlayerFragment : Fragment() {
+
+    @Inject lateinit var controllerCallbackHelper: ControllerCallbackHelper
+    @Inject lateinit var repeatStateHelper: RepeatStateHelper
+    @Inject lateinit var playbackHelper: PlaybackHelper
 
     private var _binding: PlayerFragmentBinding? = null
     private val binding: PlayerFragmentBinding
     get() = _binding!!
 
-    private var shouldShowMessage: Boolean = false
-
-    private val viewModel: PlayerViewModel by viewModels()
     private val controller get() = requireActivity().mediaController
     private var progressJob: Job? = null
 
@@ -67,29 +72,8 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        collectWithLifecycle(viewModel.state) { it?.let { updateState(it) } }
-        collectWithLifecycle(viewModel.metadata) { it?.let { updateMetadata(it) } }
-
-        collectWithLifecycle(viewModel.repeatState) { repeatState ->
-            if (shouldShowMessage) {
-                when(repeatState) {
-                    is RepeatState.RepeatOff -> {
-                        showToast("Repeat Off")
-                        setProperStateImage()
-                    }
-                    is RepeatState.RepeatAll -> {
-                        showToast("Repeat All")
-                        setProperStateImage()
-                    }
-                    is RepeatState.RepeatOne -> {
-                        showToast("Repeat Single")
-                        setProperStateImage()
-                    }
-                    else -> Unit
-                }
-                shouldShowMessage = false
-            }
-        }
+        collectWithLifecycle(controllerCallbackHelper.state) { it?.let { updateState(it) } }
+        collectWithLifecycle(controllerCallbackHelper.metadata) { it?.let { updateMetadata(it) } }
 
         binding.apply {
             btnPlayPause.setOnClickListener {
@@ -101,8 +85,7 @@ class PlayerFragment : Fragment() {
             }
 
             btnRepeat.setOnClickListener {
-                shouldShowMessage = true
-                viewModel.onEvent(Event.ToggleRepeatState)
+                updateRepeatState(repeatStateHelper.toggleState())
             }
 
             btnNext.setOnClickListener {
@@ -117,6 +100,23 @@ class PlayerFragment : Fragment() {
             }
             seekbarProgress.setOnSeekBarChangeListener(seekBarChangeListener)
             setProperStateImage()
+        }
+    }
+
+    private fun updateRepeatState(repeatState: RepeatState) {
+        when(repeatState) {
+            is RepeatState.RepeatOff -> {
+                showToast("Repeat Off")
+                setProperStateImage()
+            }
+            is RepeatState.RepeatAll -> {
+                showToast("Repeat All")
+                setProperStateImage()
+            }
+            is RepeatState.RepeatOne -> {
+                showToast("Repeat Single")
+                setProperStateImage()
+            }
         }
     }
 
@@ -206,7 +206,7 @@ class PlayerFragment : Fragment() {
 
     private fun setProperStateImage() {
         binding.apply {
-            when(viewModel.repeatState.value) {
+            when(repeatStateHelper.getState()) {
                 is RepeatState.RepeatOff -> {
                     btnRepeat.setImageResource(R.drawable.ic_repeat_off)
                 }
@@ -225,14 +225,14 @@ class PlayerFragment : Fragment() {
         when (state) {
             PlaybackStateCompat.STATE_PLAYING -> {
                 cancelProgress()
-                val endTime = viewModel.metadata.value?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: -1L
+                val endTime = controllerCallbackHelper.metadata.value?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: -1L
                 progressJob = lifecycleScope.launch {
                     binding.apply {
                         textEndTime.text = getTimeStamp(endTime)
                         seekbarProgress.max = endTime.toInt()
                         while (isActive) {
-                            if (viewModel.isPlaying()) {
-                                seekbarProgress.progress = viewModel.getPlaybackPosition()
+                            if (playbackHelper.isPlaying()) {
+                                seekbarProgress.progress = playbackHelper.getPlaybackPosition()
                                 textStartTime.text = getTimeStamp(seekbarProgress.progress.toLong())
                             } else cancelProgress()
                             delay(1000L)
@@ -251,7 +251,7 @@ class PlayerFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.state.value?.run { updateProgress(this.state) }
+        controllerCallbackHelper.state.value?.let { updateProgress(it.state) }
     }
 
     private fun cancelProgress() {

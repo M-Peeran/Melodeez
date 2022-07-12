@@ -9,7 +9,24 @@ class RepeatStateHelper {
 
     fun getState() = repeatState
 
-    fun setState(state: RepeatState) {
-        repeatState = state
+    fun toggleState(): RepeatState {
+        return when(getState()) {
+            null -> {
+                repeatState = RepeatState.RepeatAll
+                getState()!!
+            }
+            is RepeatState.RepeatOff -> {
+                repeatState = RepeatState.RepeatAll
+                getState()!!
+            }
+            is RepeatState.RepeatAll -> {
+                repeatState = RepeatState.RepeatOne
+                getState()!!
+            }
+            is RepeatState.RepeatOne -> {
+                repeatState = RepeatState.RepeatOff
+                getState()!!
+            }
+        }
     }
 }

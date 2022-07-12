@@ -5,22 +5,17 @@ import android.net.Uri
 
 interface PlaybackHelper {
 
-    fun getPlaybackPosition(): Int
-
+    fun isPlaying(): Boolean
     fun isLooping(): Boolean
 
-    fun isPlaying(): Boolean
-
     fun pausePlayback()
-
     fun resumePlayback()
-
     fun playTrack(trackUri: Uri)
 
+    fun getPlaybackPosition(): Int
     fun seekToPosition(position: Int)
 
     fun stopPlayback()
-
     fun release()
 
     fun setCompletionListener(listener: MediaPlayer.OnCompletionListener)

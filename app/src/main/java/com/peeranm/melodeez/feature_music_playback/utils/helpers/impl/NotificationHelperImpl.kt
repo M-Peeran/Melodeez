@@ -19,7 +19,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.feature_music_playback.presentation.MainActivity
-import com.peeranm.melodeez.feature_music_playback.use_cases.media_player_use_cases.IsPlayingUseCase
 import com.peeranm.melodeez.feature_music_playback.utils.ButtonReceiver
 import com.peeranm.melodeez.feature_music_playback.utils.NotificationActionListener
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.NotificationHelper
@@ -27,10 +26,7 @@ import java.io.File
 import java.io.FileNotFoundException
 
 
-class NotificationHelperImpl(
-    private val context: Context,
-    private val isPlaying: IsPlayingUseCase
-) : NotificationHelper {
+class NotificationHelperImpl(private val context: Context) : NotificationHelper {
 
     private var listener: NotificationActionListener? = null
 
@@ -80,7 +76,8 @@ class NotificationHelperImpl(
 
     override fun getNotification(
         metadata: MediaMetadataCompat?,
-        sessionToken: MediaSessionCompat.Token
+        sessionToken: MediaSessionCompat.Token,
+        isPlaying: Boolean
     ) = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID).apply {
         setContentTitle(metadata?.getText(MediaMetadata.METADATA_KEY_TITLE))
         setContentText(metadata?.getText(MediaMetadata.METADATA_KEY_ALBUM_ARTIST))
@@ -110,7 +107,7 @@ class NotificationHelperImpl(
             ).build()
         )
         addAction(
-            if (isPlaying()) {
+            if (isPlaying) {
                 NotificationCompat.Action.Builder(
                     R.drawable.ic_pause_playback,
                     "Pause",

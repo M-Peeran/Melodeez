@@ -1,6 +1,5 @@
 package com.peeranm.melodeez.feature_music_playback.utils
 
-import android.app.Notification
 import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaMetadata
@@ -17,16 +16,11 @@ import androidx.media.MediaBrowserServiceCompat
 import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.feature_music_playback.model.Track
-import com.peeranm.melodeez.feature_music_playback.use_cases.media_player_use_cases.MediaPlayerUseCases
-import com.peeranm.melodeez.feature_music_playback.use_cases.playback_use_cases.PlaybackUseCases
 import com.peeranm.melodeez.feature_music_playback.use_cases.playlist_use_cases.PlaylistUseCases
-import com.peeranm.melodeez.feature_music_playback.utils.helpers.RepeatStateHelper
 import com.peeranm.melodeez.feature_music_playback.use_cases.tracks_use_cases.TrackUseCases
 import com.peeranm.melodeez.feature_music_playback.use_cases.album_use_cases.AlbumUseCases
 import com.peeranm.melodeez.feature_music_playback.use_cases.artist_use_cases.ArtistUseCases
-import com.peeranm.melodeez.feature_music_playback.utils.helpers.AudioFocusHelper
-import com.peeranm.melodeez.feature_music_playback.utils.helpers.NotificationHelper
-import com.peeranm.melodeez.feature_music_playback.utils.helpers.PlaybackSourceHelper
+import com.peeranm.melodeez.feature_music_playback.utils.helpers.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,8 +41,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
     @Inject lateinit var albumUseCases: AlbumUseCases
     @Inject lateinit var artistUseCases: ArtistUseCases
     @Inject lateinit var playlistUseCases: PlaylistUseCases
-    @Inject lateinit var mediaPlayerUseCases: MediaPlayerUseCases
-    @Inject lateinit var playbackUseCases: PlaybackUseCases
+    @Inject lateinit var playbackHelper: PlaybackHelper
 
     private lateinit var mediaSession: MediaSessionCompat
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -68,7 +61,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         val metadata = getMetadataBuilder(track).build()
 
                         mediaSession.setMetadata(metadata)
-                        playbackUseCases.playTrack(track.uri.toUri())
+                        playbackHelper.playTrack(track.uri.toUri())
                         mediaSession.setPlaybackState(playbackState)
 
                         notificationHelper.registerReceiver()
@@ -77,28 +70,49 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         playbackSourceHelper.setCurrentSource(tracks)
                     }.invokeOnCompletion {
                         startService(Intent(baseContext, PlaybackService::class.java))
-                        startForeground(NOTIFICATION_ID, getNotification())
+                        startForeground(
+                            NOTIFICATION_ID,
+                            notificationHelper.getNotification(
+                                mediaSession.controller.metadata,
+                                mediaSession.sessionToken,
+                                playbackHelper.isPlaying()
+                            )
+                        )
                     }
                 }
             }
         }
 
         override fun onPlay() {
-            playbackUseCases.resumePlayback()
+            playbackHelper.resumePlayback()
             val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
             mediaSession.setPlaybackState(playbackState)
-            startForeground(NOTIFICATION_ID, getNotification())
+            startForeground(
+                NOTIFICATION_ID,
+                notificationHelper.getNotification(
+                    mediaSession.controller.metadata,
+                    mediaSession.sessionToken,
+                    playbackHelper.isPlaying()
+                )
+            )
         }
 
         override fun onPause() {
-            playbackUseCases.pausePlayback()
+            playbackHelper.pausePlayback()
             val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PAUSED).build()
             mediaSession.setPlaybackState(playbackState)
-            startForeground(NOTIFICATION_ID, getNotification())
+            startForeground(
+                NOTIFICATION_ID,
+                notificationHelper.getNotification(
+                    mediaSession.controller.metadata,
+                    mediaSession.sessionToken,
+                    playbackHelper.isPlaying()
+                )
+            )
         }
 
         override fun onStop() {
-            playbackUseCases.stopPlayback()
+            playbackHelper.stopPlayback()
             val playbackState = getStateBuilder(PlaybackStateCompat.STATE_STOPPED).build()
             mediaSession.setPlaybackState(playbackState)
             notificationHelper.unregisterReceiver()
@@ -121,11 +135,18 @@ class PlaybackService : MediaBrowserServiceCompat(),
                             val metadata = getMetadataBuilder(track).build()
 
                             mediaSession.setMetadata(metadata)
-                            playbackUseCases.playTrack(track.uri.toUri())
+                            playbackHelper.playTrack(track.uri.toUri())
                             mediaSession.setPlaybackState(playbackState)
 
                             startService(Intent(baseContext, PlaybackService::class.java))
-                            startForeground(NOTIFICATION_ID, getNotification())
+                            startForeground(
+                                NOTIFICATION_ID,
+                                notificationHelper.getNotification(
+                                    mediaSession.controller.metadata,
+                                    mediaSession.sessionToken,
+                                    playbackHelper.isPlaying()
+                                )
+                            )
 
                             playbackSourceHelper.setTrackPosition(position+1)
                         }
@@ -148,11 +169,18 @@ class PlaybackService : MediaBrowserServiceCompat(),
                             val metadata = getMetadataBuilder(track).build()
 
                             mediaSession.setMetadata(metadata)
-                            playbackUseCases.playTrack(track.uri.toUri())
+                            playbackHelper.playTrack(track.uri.toUri())
                             mediaSession.setPlaybackState(playbackState)
 
                             startService(Intent(baseContext, PlaybackService::class.java))
-                            startForeground(NOTIFICATION_ID, getNotification())
+                            startForeground(
+                                NOTIFICATION_ID,
+                                notificationHelper.getNotification(
+                                    mediaSession.controller.metadata,
+                                    mediaSession.sessionToken,
+                                    playbackHelper.isPlaying()
+                                )
+                            )
 
                             playbackSourceHelper.setTrackPosition(position-1)
                         }
@@ -163,9 +191,9 @@ class PlaybackService : MediaBrowserServiceCompat(),
 
         override fun onSeekTo(pos: Long) {
 
-            playbackUseCases.seekToPosition(pos.toInt())
+            playbackHelper.seekToPosition(pos.toInt())
 
-            if (mediaPlayerUseCases.isPlaying()) {
+            if (playbackHelper.isPlaying()) {
                 val playbackState = getStateBuilder(PlaybackStateCompat.STATE_PLAYING).build()
                 mediaSession.setPlaybackState(playbackState)
             } else {
@@ -190,7 +218,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
 
     override fun onCompletion(mediaPlayer: MediaPlayer?) {
         when (repeatStateHelper.getState()) {
-            is RepeatState.RepeatOne -> playbackUseCases.resumePlayback()
+            is RepeatState.RepeatOne -> playbackHelper.resumePlayback()
             is RepeatState.RepeatOff -> {
                 val tracksSize = playbackSourceHelper.getCurrentSourceSize()
                 val currentTrackPosition = playbackSourceHelper.getCurrentTrackPosition()
@@ -250,7 +278,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
             PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
             PlaybackStateCompat.ACTION_SEEK_TO or
             PlaybackStateCompat.ACTION_STOP
-        ).setState(state, mediaPlayerUseCases.getPlaybackPosition().toLong(), 1f)
+        ).setState(state, playbackHelper.getPlaybackPosition().toLong(), 1f)
     }
 
     override fun onCreate() {
@@ -276,14 +304,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
         }
         audioFocusHelper.setListener(this)
         notificationHelper.setListener(this)
-        mediaPlayerUseCases.setCompletionListener(this)
-    }
-
-    private fun getNotification(): Notification {
-        return notificationHelper.getNotification(
-            metadata = mediaSession.controller.metadata,
-            sessionToken = mediaSession.sessionToken
-        )
+        playbackHelper.setCompletionListener(this)
     }
 
     private suspend fun getTracks(sourceKind: String?, mediaId: Long): List<Track> {
@@ -320,14 +341,11 @@ class PlaybackService : MediaBrowserServiceCompat(),
         super.onDestroy()
         audioFocusHelper.abandonAudioFocus()
         notificationHelper.unregisterReceiver()
-        playbackUseCases.releasePlayer()
+        playbackHelper.release()
         mediaSession.isActive = false
         mediaSession.release()
     }
 
-
-
-    // NO NEED FOR THESE BECAUSE WE ONLY SUPPORT OFFLINE PLAYBACK
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot {
         return BrowserRoot(getString(R.string.app_name), null)
     }

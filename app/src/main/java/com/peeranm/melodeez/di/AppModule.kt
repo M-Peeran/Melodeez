@@ -7,8 +7,6 @@ import android.media.MediaPlayer
 import com.peeranm.melodeez.feature_music_playback.data.device_storage.AlbumsSource
 import com.peeranm.melodeez.feature_music_playback.data.device_storage.TracksSource
 import com.peeranm.melodeez.feature_music_playback.data.local.MusicDatabase
-import com.peeranm.melodeez.feature_music_playback.use_cases.media_player_use_cases.*
-import com.peeranm.melodeez.feature_music_playback.use_cases.playback_use_cases.*
 import com.peeranm.melodeez.feature_music_playback.use_cases.track_info_use_cases.GetMetadataUseCase
 import com.peeranm.melodeez.feature_music_playback.use_cases.track_info_use_cases.GetPlaybackStateUseCase
 import com.peeranm.melodeez.feature_music_playback.use_cases.track_info_use_cases.TrackInfoUseCases
@@ -46,7 +44,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePlaybackManager(@ApplicationContext context: Context): PlaybackHelper {
+    fun providePlaybackHelper(@ApplicationContext context: Context): PlaybackHelper {
         return PlaybackHelperImpl(
             context = context,
             mediaPlayer = MediaPlayer().apply {
@@ -63,49 +61,15 @@ object AppModule {
     @Singleton
     @Provides
     fun providePlaybackNotificationManager(
-        @ApplicationContext context: Context,
-        playerUseCases: MediaPlayerUseCases
+        @ApplicationContext context: Context
     ): NotificationHelper {
-
-        return NotificationHelperImpl(
-            context = context,
-            isPlaying = playerUseCases.isPlaying
-        )
+        return NotificationHelperImpl(context)
     }
 
     @Singleton
     @Provides
     fun provideControllerCallbackLive(): ControllerCallbackHelper {
         return ControllerCallbackHelperImpl()
-    }
-
-    @Singleton
-    @Provides
-    fun providePlaybackUseCases(
-        playbackHelper: PlaybackHelper,
-        repeatStateHelper: RepeatStateHelper
-    ): PlaybackUseCases {
-        return PlaybackUseCases(
-            playTrack = PlayTrackUseCase(playbackHelper),
-            pausePlayback = PausePlaybackUseCase(playbackHelper),
-            resumePlayback = ResumePlaybackUseCase(playbackHelper),
-            stopPlayback = StopPlaybackUseCase(playbackHelper),
-            seekToPosition = SeekToPositionUseCase(playbackHelper),
-            releasePlayer = ReleasePlayerUseCase(playbackHelper),
-            toggleRepeatState = ToggleRepeatStateUseCase(repeatStateHelper),
-            getRepeatState = GetRepeatStateUseCase(repeatStateHelper)
-        )
-    }
-
-    @Singleton
-    @Provides
-    fun provideMediaPlayerUseCases(playbackHelper: PlaybackHelper): MediaPlayerUseCases {
-        return MediaPlayerUseCases(
-            isPlaying = IsPlayingUseCase(playbackHelper),
-            isLooping = IsLoopingUseCase(playbackHelper),
-            getPlaybackPosition = GetPlaybackPositionUseCase(playbackHelper),
-            setCompletionListener = SetCompletionListenerUseCase(playbackHelper)
-        )
     }
 
     @Provides

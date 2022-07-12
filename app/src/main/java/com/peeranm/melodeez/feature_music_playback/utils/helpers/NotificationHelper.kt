@@ -9,7 +9,8 @@ interface NotificationHelper {
 
     fun getNotification(
         metadata: MediaMetadataCompat?,
-        sessionToken: MediaSessionCompat.Token
+        sessionToken: MediaSessionCompat.Token,
+        isPlaying: Boolean = false
     ): Notification
 
     fun registerReceiver()
