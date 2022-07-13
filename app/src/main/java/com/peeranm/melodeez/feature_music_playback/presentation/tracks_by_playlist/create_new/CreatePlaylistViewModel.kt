@@ -17,14 +17,11 @@ class CreatePlaylistViewModel @Inject constructor(
     private val _uiAction = MutableStateFlow<UiAction>(UiAction.None)
     val uiAction = _uiAction.asStateFlow()
 
-    fun onEvent(event: Event) {
-        when (event) {
-            is Event.CreatePlaylist -> viewModelScope.launch {
-                val playlistId = playlistUseCases.insertPlaylist(event.name)
-                _uiAction.value = UiAction.NavigateWithPlaylistId(playlistId)
-            }
+    fun createPlaylist(playlistName: String) {
+        viewModelScope.launch {
+            val playlistId = playlistUseCases.insertPlaylist(playlistName)
+            _uiAction.value = UiAction.NavigateWithPlaylistId(playlistId)
         }
     }
-
 
 }
