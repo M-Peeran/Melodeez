@@ -17,18 +17,22 @@ class PlaylistDetailsDialogViewModel @Inject constructor(
     private val playbackSourceHelper: PlaybackSourceHelper
 ) : ViewModel() {
 
-    private val _isSuccessful = MutableStateFlow<Boolean?>(null)
-    val isSuccessful: StateFlow<Boolean?> = _isSuccessful
+    private val _message = MutableStateFlow("")
+    val message: StateFlow<String> = _message
 
     fun addToQueue(track: Track) {
         val tracks = playbackSourceHelper.getCurrentSource()
-        val isNotEmpty = (tracks.isNotEmpty())
+        val isNotEmpty = tracks.isNotEmpty()
         val trackNotExists = !tracks.contains(track)
-        if (isNotEmpty && trackNotExists) {
-            (tracks as MutableList).add(track)
-            playbackSourceHelper.setCurrentSource(tracks)
+        when {
+            isNotEmpty && trackNotExists -> {
+                (tracks as MutableList).add(track)
+                playbackSourceHelper.setCurrentSource(tracks)
+                _message.value = "Added successfully"
+            }
+            !isNotEmpty -> _message.value = "Failed : Queue is empty"
+            !trackNotExists -> _message.value = "Already added to the queue!"
         }
-        _isSuccessful.value = isNotEmpty
     }
 
     fun deleteTrackFromPlaylist(trackId: Long, playlistId: Long) {
@@ -37,7 +41,7 @@ class PlaylistDetailsDialogViewModel @Inject constructor(
                 playlistId = playlistId,
                 trackId = trackId
             )
-        }
+        }.invokeOnCompletion { _message.value = "Deleted successfully!" }
     }
 
 }
