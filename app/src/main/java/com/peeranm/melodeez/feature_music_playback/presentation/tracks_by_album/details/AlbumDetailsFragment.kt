@@ -65,6 +65,10 @@ class AlbumDetailsFragment : Fragment(), OnItemClickListener<Track> {
             binding.bindAlbumAndTracks(it.album, it.tracks)
         }
 
+        collectWithLifecycle(viewModel.message) { message ->
+            if (message.isNotEmpty()) showToast(message)
+        }
+
     }
 
     override fun onItemClick(view: View?, data: Track, position: Int) {
