@@ -34,14 +34,10 @@ class PlaylistDetailsViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: Event) {
-        when (event) {
-            is Event.DeletePlaylist -> {
-                viewModelScope.launch {
-                    val deletedPlaylistCount = playlistUseCases.deletePlaylist(event.playlistId)
-                    _isDeletionSuccess.value = deletedPlaylistCount != 0
-                }
-            }
+    fun deletePlaylist(playlistId: Long) {
+        viewModelScope.launch {
+            val deletedPlaylistCount = playlistUseCases.deletePlaylist(playlistId)
+            _isDeletionSuccess.value = deletedPlaylistCount != 0
         }
     }
 

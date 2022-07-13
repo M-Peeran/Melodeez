@@ -121,7 +121,7 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
                 true
             }
             R.id.actionDeletePlaylist -> {
-                viewModel.onEvent(Event.DeletePlaylist(args.playlistId))
+                viewModel.deletePlaylist(args.playlistId)
                 true
             }
             else -> super.onOptionsItemSelected(item)
