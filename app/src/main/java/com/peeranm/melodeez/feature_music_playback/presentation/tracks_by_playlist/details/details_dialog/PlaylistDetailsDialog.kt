@@ -39,13 +39,10 @@ class PlaylistDetailsDialog(
             handleOnDeleteFromPlaylistClick()
         }
 
-        collectWithLifecycle(viewModel.isSuccessful) { isSuccessful ->
-            isSuccessful?.let {
-                if (it) {
-                    showToast("Added to queue")
-                } else {
-                    showToast("Failed : queue is empty")
-                }
+        collectWithLifecycle(viewModel.message) { message ->
+            if (message.isNotEmpty()) {
+                showToast(message)
+                dismiss()
             }
         }
 
@@ -54,16 +51,13 @@ class PlaylistDetailsDialog(
 
     private fun PlaylistDetailsDialogBinding.handleOnAddToQueueClick() {
         textAddToQueue.setOnClickListener {
-            viewModel.onEvent(Event.AddToQueue(track))
-            dismiss()
+            viewModel.addToQueue(track)
         }
     }
 
     private fun PlaylistDetailsDialogBinding.handleOnDeleteFromPlaylistClick() {
         textDeleteFromPlaylist.setOnClickListener {
-            viewModel.onEvent(Event.DeleteTrackFromPlaylist(playlistId, track.trackId))
-            showToast("Deleted successfully!")
-            dismiss()
+            viewModel.deleteTrackFromPlaylist(playlistId, track.trackId)
         }
     }
 

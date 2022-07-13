@@ -22,14 +22,18 @@ class AlbumDetailsViewModel @Inject constructor(
     private val _albumWithTracks = MutableStateFlow(getDummyAlbumWithTracks())
     val albumWithTracks = _albumWithTracks.asStateFlow()
 
+    private val _message = MutableStateFlow("")
+    val message = _message.asStateFlow()
+
     init {
         val albumId = savedStateHandle.get<Long>(ARG_ALBUM_ID)
         if (albumId != null) {
             viewModelScope.launch {
                 val albumWithTracks = albumUseCases.getAlbumWithTracks(albumId)
-                _albumWithTracks.value = albumWithTracks ?: return@launch
+                if (albumWithTracks != null) _albumWithTracks.value = albumWithTracks
+                else _message.value = "The Album you are looking for is not found!"
             }
-        }
+        } else _message.value = "AlbumId is null!"
     }
 
     private fun getDummyAlbumWithTracks() = AlbumWithTracks(

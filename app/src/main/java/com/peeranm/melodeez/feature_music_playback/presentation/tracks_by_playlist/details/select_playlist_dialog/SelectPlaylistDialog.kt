@@ -52,7 +52,7 @@ class SelectPlaylistDialog(private val track: Track) : DialogFragment(), OnCheck
 
     override fun onResume() {
         super.onResume()
-        viewModel.onEvent(Event.GetPlaylists)
+        viewModel.getPlaylists()
     }
 
     override fun onCheckChange(
@@ -62,7 +62,7 @@ class SelectPlaylistDialog(private val track: Track) : DialogFragment(), OnCheck
         position: Int
     ) {
         if (isSelected) {
-            viewModel.onEvent(Event.InsertTrackToPlaylist(data.playlistId, track.trackId))
+            viewModel.insertTrackToPlaylist(data.playlistId, track.trackId)
             showToast("Added ${track.title} to ${data.name} successfully!")
             dismiss()
         }

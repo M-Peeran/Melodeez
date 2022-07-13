@@ -69,7 +69,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
                         playbackSourceHelper.setSourceKind(mediaId!!)
                         playbackSourceHelper.setTrackPosition(position)
                         playbackSourceHelper.setCurrentSource(tracks)
-                    }.invokeOnCompletion {
+
                         startService(Intent(baseContext, PlaybackService::class.java))
                         startForeground(
                             NOTIFICATION_ID,

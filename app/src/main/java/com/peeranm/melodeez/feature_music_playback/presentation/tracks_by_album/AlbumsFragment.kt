@@ -52,7 +52,7 @@ class AlbumsFragment : Fragment(), OnItemClickListener<Album> {
         }
 
         binding.toggleProgressbarVisibility(showNow = true)
-        viewModel.setStateEvent(Event.Synchronize)
+        viewModel.synchronizeAlbums()
     }
 
     override fun onItemClick(view: View?, data: Album, position: Int) {

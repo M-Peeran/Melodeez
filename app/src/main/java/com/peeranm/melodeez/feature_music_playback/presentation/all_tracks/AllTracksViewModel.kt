@@ -3,7 +3,6 @@ package com.peeranm.melodeez.feature_music_playback.presentation.all_tracks
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peeranm.melodeez.feature_music_playback.model.Track
-import com.peeranm.melodeez.feature_music_playback.presentation.Event
 import com.peeranm.melodeez.feature_music_playback.use_cases.tracks_use_cases.TrackUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -16,17 +15,11 @@ class AllTracksViewModel @Inject constructor(
 ) : ViewModel() {
 
     val tracks: StateFlow<List<Track>>
-    get() = trackUseCases.getTracksFromCacheForUi()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    get() = trackUseCases.getTracksFromCacheForUi().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-
-    fun onEvent(event: Event) {
-        when (event) {
-            Event.Synchronize -> {
-                viewModelScope.launch {
-                    trackUseCases.synchronizeTracks()
-                }
-            }
+    fun synchronizeTracks() {
+        viewModelScope.launch {
+            trackUseCases.synchronizeTracks()
         }
     }
 }

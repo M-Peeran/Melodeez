@@ -69,7 +69,7 @@ class AddTracksFragment : Fragment(), OnCheckChangeListener<Track> {
 
     private fun AddTracksFragmentBinding.handleOnBtnAddSelectedClick() {
         btnAddSelected.setOnClickListener {
-            viewModel.onEvent(Event.AddSelectedTracksToPlaylist(args.playlistId))
+            viewModel.addTracksToPlaylist(args.playlistId)
             showToast("Added successfully")
             findNavController().navigateUp()
         }
@@ -77,7 +77,7 @@ class AddTracksFragment : Fragment(), OnCheckChangeListener<Track> {
 
     private fun AddTracksFragmentBinding.handleOnBtnCancelClick() {
         btnCancel.setOnClickListener {
-            viewModel.onEvent(Event.Clear)
+            viewModel.clearSelection()
             findNavController().navigateUp()
         }
     }
@@ -109,7 +109,7 @@ class AddTracksFragment : Fragment(), OnCheckChangeListener<Track> {
         data: Track,
         isSelected: Boolean,
         position: Int
-    ) { viewModel.onEvent(Event.ToggleTrackSelection(data.trackId, isSelected)) }
+    ) { viewModel.toggleTrackSelection(data.trackId, isSelected) }
 
     override fun onDestroyView() {
         super.onDestroyView()

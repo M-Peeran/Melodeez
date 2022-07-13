@@ -2,6 +2,7 @@ package com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_playl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.use_cases.playlist_use_cases.PlaylistUseCases
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.PlaybackSourceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,30 +17,31 @@ class PlaylistDetailsDialogViewModel @Inject constructor(
     private val playbackSourceHelper: PlaybackSourceHelper
 ) : ViewModel() {
 
-    private val _isSuccessful = MutableStateFlow<Boolean?>(null)
-    val isSuccessful: StateFlow<Boolean?> = _isSuccessful
+    private val _message = MutableStateFlow("")
+    val message: StateFlow<String> = _message
 
-    fun onEvent(event: Event) {
-        when (event) {
-            is Event.DeleteTrackFromPlaylist -> {
-                viewModelScope.launch {
-                    playlistUseCases.deleteTrackFromPlaylist(
-                        playlistId = event.playlistId,
-                        trackId = event.trackId
-                    )
-                }
+    fun addToQueue(track: Track) {
+        val tracks = playbackSourceHelper.getCurrentSource()
+        val isNotEmpty = tracks.isNotEmpty()
+        val trackNotExists = !tracks.contains(track)
+        when {
+            isNotEmpty && trackNotExists -> {
+                (tracks as MutableList).add(track)
+                playbackSourceHelper.setCurrentSource(tracks)
+                _message.value = "Added successfully"
             }
-            is Event.AddToQueue -> {
-                val tracks = playbackSourceHelper.getCurrentSource()
-                val isNotEmpty = (tracks.isNotEmpty())
-                val trackNotExists = !tracks.contains(event.track)
-                if (isNotEmpty && trackNotExists) {
-                    (tracks as MutableList).add(event.track)
-                    playbackSourceHelper.setCurrentSource(tracks)
-                }
-                _isSuccessful.value = isNotEmpty
-            }
+            !isNotEmpty -> _message.value = "Failed : Queue is empty"
+            !trackNotExists -> _message.value = "Already added to the queue!"
         }
+    }
+
+    fun deleteTrackFromPlaylist(playlistId: Long, trackId: Long) {
+        viewModelScope.launch {
+            playlistUseCases.deleteTrackFromPlaylist(
+                playlistId = playlistId,
+                trackId = trackId
+            )
+        }.invokeOnCompletion { _message.value = "Deleted successfully!" }
     }
 
 }

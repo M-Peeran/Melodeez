@@ -88,7 +88,7 @@ object AppModule {
     @Singleton
     @Provides
     fun providePlaylistUseCases(database: MusicDatabase): PlaylistUseCases {
-        val playlistRepository = PlaylistRepositoryImpl(database)
+        val playlistRepository = PlaylistRepositoryImpl(database.playlistDao())
         return PlaylistUseCases(
             getPlaylists = GetPlaylistsUseCase(playlistRepository),
             getPlaylist = GetPlaylistUseCase(playlistRepository),

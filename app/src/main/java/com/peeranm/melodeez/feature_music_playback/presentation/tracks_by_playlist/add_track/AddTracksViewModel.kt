@@ -16,7 +16,7 @@ class AddTracksViewModel @Inject constructor(
     private val playlistUseCases: PlaylistUseCases
 ) : ViewModel() {
 
-    private val selectedTracks = mutableMapOf<Long, Boolean>()
+    private val selectedTrackIds = mutableListOf<Long>()
 
     val tracksState: StateFlow<List<Track>>
     get() = tracksUseCases.getTracksFromCacheForUi().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -24,23 +24,28 @@ class AddTracksViewModel @Inject constructor(
     private val _isAnyTrackSelected = MutableStateFlow(false)
     val isAnyTrackSelected: StateFlow<Boolean> = _isAnyTrackSelected
 
-    fun onEvent(event: Event) {
-        when (event) {
-            is Event.AddSelectedTracksToPlaylist -> viewModelScope.launch {
-                val trackIds = selectedTracks.keys.toList()
-                playlistUseCases.insertTracksToPlaylist(trackIds, event.playlistId)
-            }
-
-            is Event.ToggleTrackSelection -> {
-                val isSelectedAlready = selectedTracks[event.trackId] ?: false
-                when {
-                    !isSelectedAlready -> selectedTracks[event.trackId] = true
-                    !event.isSelected -> selectedTracks.remove(event.trackId)
-                }
-                _isAnyTrackSelected.value = selectedTracks.isNotEmpty()
-            }
-
-            is Event.Clear -> selectedTracks.clear()
+    fun toggleTrackSelection(trackId: Long, isSelected: Boolean) {
+        val isExists = selectedTrackIds.contains(trackId)
+        val trackShouldBeAdded = !isExists && isSelected
+        val trackShouldBeRemoved = isExists && !isSelected
+        if (trackShouldBeAdded) {
+            selectedTrackIds.add(trackId)
+            _isAnyTrackSelected.value = selectedTrackIds.isNotEmpty()
+            return
         }
+        if (trackShouldBeRemoved) {
+            selectedTrackIds.remove(trackId)
+            _isAnyTrackSelected.value = selectedTrackIds.isNotEmpty()
+        }
+    }
+
+    fun addTracksToPlaylist(playlistId: Long) {
+        viewModelScope.launch {
+            playlistUseCases.insertTracksToPlaylist(selectedTrackIds, playlistId)
+        }
+    }
+
+    fun clearSelection() {
+        selectedTrackIds.removeAll(selectedTrackIds)
     }
 }

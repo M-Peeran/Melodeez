@@ -51,7 +51,7 @@ class ArtistsFragment : Fragment(), OnItemClickListener<Artist> {
         }
 
         binding.toggleProgressbarVisibility(showNow = true)
-        viewModel.setStateEvent(Event.Synchronize)
+        viewModel.synchronizeArtists()
     }
 
     override fun onItemClick(view: View?, data: Artist, position: Int) {

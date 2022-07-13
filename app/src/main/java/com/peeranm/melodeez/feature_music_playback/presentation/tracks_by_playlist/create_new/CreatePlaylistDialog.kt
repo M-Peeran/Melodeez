@@ -45,7 +45,7 @@ class CreatePlaylistDialog : DialogFragment() {
 
         positiveButton.setOnClickListener {
             if (enteredText.isNotEmpty() && enteredText.isNotBlank()) {
-                viewModel.onEvent(Event.CreatePlaylist(enteredText))
+                viewModel.createPlaylist(enteredText)
             } else binding.etextEnterTitle.error = "Name cannot be empty!"
         }
 

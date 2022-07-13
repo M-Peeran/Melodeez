@@ -17,13 +17,9 @@ class AlbumsViewModel @Inject constructor(
     val albums: StateFlow<List<Album>>
     get() = albumUseCases.getAlbumsFromCacheForUi().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun setStateEvent(event: Event) {
-        when (event) {
-            Event.Synchronize -> {
-                viewModelScope.launch {
-                    albumUseCases.synchronizeAlbums()
-                }
-            }
+    fun synchronizeAlbums() {
+        viewModelScope.launch {
+            albumUseCases.synchronizeAlbums()
         }
     }
 }

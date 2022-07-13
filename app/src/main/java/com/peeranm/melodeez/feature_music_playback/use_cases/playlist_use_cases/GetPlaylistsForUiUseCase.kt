@@ -5,7 +5,7 @@ import com.peeranm.melodeez.feature_music_playback.model.Playlist
 import kotlinx.coroutines.flow.Flow
 
 class GetPlaylistsForUiUseCase(private val repository: PlaylistRepository) {
-    operator fun invoke(): Flow<List<Playlist>> {
-        return repository.getPlaylistsAsFlow()
-    }
+
+    operator fun invoke(): Flow<List<Playlist>>
+    = repository.getPlaylistsAsFlow()
 }
