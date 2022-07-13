@@ -48,19 +48,8 @@ class PlaylistsFragment : Fragment(), OnItemClickListener<Any> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        adapter = PlaylistAdapter(requireContext(), this)
-        binding.listPlaylists.adapter = adapter
-        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.listPlaylists.layoutManager = layoutManager
-        binding.listPlaylists.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
-
-        collectWithLifecycle(viewModel.playlists) {
-            val mutableList = mutableListOf<Any>()
-            mutableList.add(ITEM_TYPE_CREATE_NEW_PLAYLIST)
-            mutableList.addAll(it)
-            adapter?.submitData(mutableList)
-        }
+        binding.bindList()
+        collectWithLifecycle(viewModel.playlists) { playlists -> submitData(playlists) }
         viewModel.getPlaylists()
     }
 
@@ -81,6 +70,22 @@ class PlaylistsFragment : Fragment(), OnItemClickListener<Any> {
             }
         }
     }
+
+    private fun PlaylistsFragmentBinding.bindList() {
+        adapter = PlaylistAdapter(requireContext(), this@PlaylistsFragment)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listPlaylists.adapter = adapter
+        listPlaylists.layoutManager = layoutManager
+        listPlaylists.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+    }
+
+    private fun submitData(playlists: List<Playlist>) {
+        val mutableList = mutableListOf<Any>()
+        mutableList.add(ITEM_TYPE_CREATE_NEW_PLAYLIST)
+        mutableList.addAll(playlists)
+        adapter?.submitData(mutableList)
+    }
+
 
     private fun showPopupMenu(anchorView: View?, data: Playlist) {
         PopupMenu(requireContext(), anchorView).apply {
