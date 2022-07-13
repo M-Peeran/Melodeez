@@ -35,7 +35,7 @@ class PlaylistDetailsDialogViewModel @Inject constructor(
         }
     }
 
-    fun deleteTrackFromPlaylist(trackId: Long, playlistId: Long) {
+    fun deleteTrackFromPlaylist(playlistId: Long, trackId: Long) {
         viewModelScope.launch {
             playlistUseCases.deleteTrackFromPlaylist(
                 playlistId = playlistId,
