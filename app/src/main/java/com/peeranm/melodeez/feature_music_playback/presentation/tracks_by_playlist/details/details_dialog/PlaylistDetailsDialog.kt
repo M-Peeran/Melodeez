@@ -6,8 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import com.peeranm.melodeez.core.collectWithLifecycle
-import com.peeranm.melodeez.core.showToast
+import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.PlaylistDetailsDialogBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,15 +54,15 @@ class PlaylistDetailsDialog(
 
     private fun PlaylistDetailsDialogBinding.handleOnAddToQueueClick() {
         textAddToQueue.setOnClickListener {
-            viewModel.onEvent(Event.DeleteTrackFromPlaylist(playlistId, track.trackId))
-            showToast("Deleted successfully!")
+            viewModel.onEvent(Event.AddToQueue(track))
             dismiss()
         }
     }
 
     private fun PlaylistDetailsDialogBinding.handleOnDeleteFromPlaylistClick() {
         textDeleteFromPlaylist.setOnClickListener {
-            viewModel.onEvent(Event.AddToQueue(track))
+            viewModel.onEvent(Event.DeleteTrackFromPlaylist(playlistId, track.trackId))
+            showToast("Deleted successfully!")
             dismiss()
         }
     }
