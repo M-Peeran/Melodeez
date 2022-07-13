@@ -8,16 +8,16 @@ import kotlinx.coroutines.flow.Flow
 
 class ArtistRepositoryImpl(private val artistDao: ArtistDao) : ArtistRepository {
 
-    override suspend fun insertArtist(artist: Artist) {
-        artistDao.insertArtist(artist)
+    override suspend fun insertArtist(artist: Artist): Long {
+        return artistDao.insertArtist(artist)
     }
 
-    override suspend fun deleteArtist(artist: Artist) {
-        artistDao.deleteArtist(artist)
+    override suspend fun deleteArtist(artist: Artist): Int {
+        return artistDao.deleteArtist(artist)
     }
 
-    override suspend fun deleteArtists() {
-        artistDao.deleteAllArtists()
+    override suspend fun deleteArtists(): Int {
+        return artistDao.deleteAllArtists()
     }
 
     override suspend fun getArtists(): List<Artist> {
@@ -28,7 +28,7 @@ class ArtistRepositoryImpl(private val artistDao: ArtistDao) : ArtistRepository 
         return artistDao.getArtistsAsFlow()
     }
 
-    override suspend fun getArtistWithTracks(artistId: Long): ArtistWithTracks {
+    override suspend fun getArtistWithTracks(artistId: Long): ArtistWithTracks? {
         return artistDao.getArtistWithTracks(artistId)
     }
 }

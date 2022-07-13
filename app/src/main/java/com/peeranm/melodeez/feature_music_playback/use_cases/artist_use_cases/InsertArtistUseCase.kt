@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class InsertArtistUseCase(private val repository: ArtistRepository) {
-    suspend operator fun invoke(artist: Artist) = withContext(Dispatchers.IO)  {
+    suspend operator fun invoke(artist: Artist): Long = withContext(Dispatchers.IO)  {
         repository.insertArtist(artist)
     }
 }

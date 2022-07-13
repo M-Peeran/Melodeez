@@ -23,9 +23,12 @@ class ArtistDetailsViewModel @Inject constructor(
     val artistWithTracks = _artistWithTracks.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val artistId = savedStateHandle.get<Long>(ARG_ARTIST_ID)!!
-            _artistWithTracks.value = artistUseCases.getArtistWithTracks(artistId)
+        val artistId = savedStateHandle.get<Long>(ARG_ARTIST_ID)
+        if (artistId != null) {
+            viewModelScope.launch {
+                val artistWithTracks = artistUseCases.getArtistWithTracks(artistId)
+                _artistWithTracks.value = artistWithTracks ?: return@launch
+            }
         }
     }
 

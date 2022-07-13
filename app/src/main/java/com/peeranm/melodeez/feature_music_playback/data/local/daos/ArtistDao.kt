@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
 interface ArtistDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertArtist(artist: Artist)
+    suspend fun insertArtist(artist: Artist): Long
 
     @Delete
-    suspend fun deleteArtist(artist: Artist)
+    suspend fun deleteArtist(artist: Artist): Int
 
     @Query("delete from artists")
-    suspend fun deleteAllArtists()
+    suspend fun deleteAllArtists(): Int
 
     @Query("select * from artists")
     suspend fun getArtists(): List<Artist>
@@ -25,6 +25,6 @@ interface ArtistDao {
 
     @Transaction
     @Query("select * from artists where artistId =:artistId")
-    suspend fun getArtistWithTracks(artistId: Long): ArtistWithTracks
+    suspend fun getArtistWithTracks(artistId: Long): ArtistWithTracks?
 
 }

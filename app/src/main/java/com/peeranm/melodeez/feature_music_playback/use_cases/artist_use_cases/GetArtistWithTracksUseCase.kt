@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class GetArtistWithTracksUseCase(private val repository: ArtistRepository) {
-    suspend operator fun invoke(artistId: Long): ArtistWithTracks = withContext(Dispatchers.IO)  {
+    suspend operator fun invoke(artistId: Long): ArtistWithTracks? = withContext(Dispatchers.IO)  {
         repository.getArtistWithTracks(artistId)
     }
 }

@@ -347,7 +347,7 @@ class PlaybackService : MediaBrowserServiceCompat(),
     }
 
     private suspend fun getTracksOfArtist(artistId: Long): List<Track> {
-        val ( _, tracks) =  artistUseCases.getArtistWithTracks(artistId)
+        val ( _, tracks) =  artistUseCases.getArtistWithTracks(artistId) ?: throw Exception("No tracks found")
         return tracks
     }
 
