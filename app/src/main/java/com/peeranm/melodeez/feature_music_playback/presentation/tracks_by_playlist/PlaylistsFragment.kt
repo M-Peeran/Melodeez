@@ -61,7 +61,7 @@ class PlaylistsFragment : Fragment(), OnItemClickListener<Any> {
             mutableList.addAll(it)
             adapter?.submitData(mutableList)
         }
-        viewModel.onEvent(Event.GetPlaylists)
+        viewModel.getPlaylists()
     }
 
     override fun onItemClick(view: View?, data: Any, position: Int) {
@@ -93,7 +93,7 @@ class PlaylistsFragment : Fragment(), OnItemClickListener<Any> {
                         )
                     }
                     R.id.actionDeletePlaylist -> {
-                        viewModel.onEvent(Event.DeletePlaylist(data.playlistId))
+                        viewModel.deletePlaylist(data.playlistId)
                         showToast("Deleted ${data.name} successfully!")
                     }
                 }

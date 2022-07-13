@@ -20,15 +20,15 @@ class PlaylistsViewModel @Inject constructor(
     private val _playlists = MutableStateFlow<List<Playlist>>(emptyList())
     val playlists: StateFlow<List<Playlist>> = _playlists
 
-    fun onEvent(event: Event) {
-        when (event) {
-            is Event.GetPlaylists -> playlistUseCases.getPlaylistsForUi()
-                .onEach { _playlists.value = it }
-                .launchIn(viewModelScope)
+    fun getPlaylists() {
+        playlistUseCases.getPlaylistsForUi()
+            .onEach { _playlists.value = it }
+            .launchIn(viewModelScope)
+    }
 
-            is Event.DeletePlaylist -> viewModelScope.launch {
-                playlistUseCases.deletePlaylist(event.playlistId)
-            }
+    fun deletePlaylist(playlistId: Long) {
+        viewModelScope.launch {
+            playlistUseCases.deletePlaylist(playlistId)
         }
     }
 
