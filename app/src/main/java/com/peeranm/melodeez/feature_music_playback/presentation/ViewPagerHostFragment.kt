@@ -103,18 +103,18 @@ class ViewPagerHostFragment : Fragment() {
         if (albumArtRef != null) {
             val imageLoadRequest = requireContext().getImageRequest(
                 albumArtRef.toString(),
-                binding.miniPlayer.imageAlbumArt
+                miniPlayer.imageAlbumArt
             )
             lifecycleScope.launch { requireContext().imageLoader.execute(imageLoadRequest) }
         } else {
-            binding.miniPlayer.imageAlbumArt.load(R.drawable.ic_music)
+            miniPlayer.imageAlbumArt.load(R.drawable.ic_music)
         }
     }
 
     private fun ViewPagerHostFragmentBinding.setupViewPager() {
         adapter = FragStateAdapter(requireActivity())
         viewPager.adapter = adapter
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = tabArray[position]
         }.attach()
     }
