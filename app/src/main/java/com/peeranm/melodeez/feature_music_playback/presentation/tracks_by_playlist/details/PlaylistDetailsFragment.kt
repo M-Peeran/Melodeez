@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.PlaylistDetailsFragmentBinding
+import com.peeranm.melodeez.feature_music_playback.model.Playlist
 import com.peeranm.melodeez.feature_music_playback.model.Track
 import com.peeranm.melodeez.feature_music_playback.presentation.tracks_by_playlist.details.details_dialog.PlaylistDetailsDialog
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
@@ -53,32 +54,11 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-
-        findNavController().let { navController ->
-            val appConfig = AppBarConfiguration(navController.graph)
-            (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
-            binding.toolbar.setupWithNavController(navController, appConfig)
-            binding.toolbar.setNavigationOnClickListener { navController.navigateUp() }
-            binding.toolbar.title = ""
-        }
-
-        adapter = SimpleTrackAdapter(requireContext(), this@PlaylistDetailsFragment)
+        binding.setupToolbar()
+        binding.bindList()
 
         collectWithLifecycle(viewModel.playlistWithTracks) { playlistWithTracks ->
-            val (playlist, tracks) = playlistWithTracks
-            binding.apply {
-                listTracksInPlaylist.adapter = adapter
-                val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-                binding.listTracksInPlaylist.layoutManager = layoutManager
-                binding.listTracksInPlaylist.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
-                textPlaylistName.text = playlist.name
-                textNoOfTracks.text = String.format(
-                    getString(R.string.no_of_tracks),
-                    playlist.noOfTracks
-                )
-                imageAlbumArt.setImageResource(R.drawable.ic_playlist)
-                adapter?.submitData(tracks)
-            }
+            binding.bindPlaylistAndTracks(playlistWithTracks.playlist, playlistWithTracks.tracks)
         }
 
         collectWithLifecycle(viewModel.isDeletionSuccess) { isSuccess ->
@@ -95,9 +75,7 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
 
     override fun onItemClick(view: View?, data: Track, position: Int) {
         when (view?.id) {
-            R.id.btnOptions -> {
-                PlaylistDetailsDialog.getInstance(data, args.playlistId,).show(childFragmentManager, "TRACK")
-            }
+            R.id.btnOptions -> PlaylistDetailsDialog.getInstance(data, args.playlistId,).show(childFragmentManager, "TRACK")
             else -> {
                 val keyBundle = Bundle()
                 keyBundle.putInt(MEDIA_POSITION, position)
@@ -128,6 +106,31 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun PlaylistDetailsFragmentBinding.setupToolbar() {
+        findNavController().let { navController ->
+            val appConfig = AppBarConfiguration(navController.graph)
+            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+            toolbar.setupWithNavController(navController, appConfig)
+            toolbar.setNavigationOnClickListener { navController.navigateUp() }
+            toolbar.title = ""
+        }
+    }
+
+    private fun PlaylistDetailsFragmentBinding.bindList() {
+        adapter = SimpleTrackAdapter(requireContext(), this@PlaylistDetailsFragment)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listTracksInPlaylist.adapter = adapter
+        listTracksInPlaylist.layoutManager = layoutManager
+        listTracksInPlaylist.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+    }
+
+    private fun PlaylistDetailsFragmentBinding.bindPlaylistAndTracks(playlist: Playlist, tracks: List<Track>) {
+        textPlaylistName.text = playlist.name
+        textNoOfTracks.text = String.format(getString(R.string.no_of_tracks), playlist.noOfTracks)
+        imageAlbumArt.setImageResource(R.drawable.ic_playlist)
+        adapter?.submitData(tracks)
     }
 
     override fun onDestroy() {
