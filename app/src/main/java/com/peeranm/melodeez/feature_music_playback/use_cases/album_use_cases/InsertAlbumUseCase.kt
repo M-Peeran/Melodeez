@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class InsertAlbumUseCase(private val repository: AlbumRepository) {
-    suspend operator fun invoke(album: Album) = withContext(Dispatchers.IO) {
+    suspend operator fun invoke(album: Album): Long = withContext(Dispatchers.IO) {
         repository.insertAlbum(album)
     }
 }

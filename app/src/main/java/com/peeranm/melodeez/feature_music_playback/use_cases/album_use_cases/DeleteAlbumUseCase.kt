@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class DeleteAlbumUseCase(private val repository: AlbumRepository) {
-    suspend operator fun invoke(album: Album) = withContext(Dispatchers.IO)  {
+    suspend operator fun invoke(album: Album): Int = withContext(Dispatchers.IO)  {
         repository.deleteAlbum(album)
     }
 }

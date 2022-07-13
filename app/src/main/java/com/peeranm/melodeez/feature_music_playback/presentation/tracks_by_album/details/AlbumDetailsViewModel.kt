@@ -23,9 +23,12 @@ class AlbumDetailsViewModel @Inject constructor(
     val albumWithTracks = _albumWithTracks.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val albumId = savedStateHandle.get<Long>(ARG_ALBUM_ID)!!
-            _albumWithTracks.value = albumUseCases.getAlbumWithTracks(albumId)
+        val albumId = savedStateHandle.get<Long>(ARG_ALBUM_ID)
+        if (albumId != null) {
+            viewModelScope.launch {
+                val albumWithTracks = albumUseCases.getAlbumWithTracks(albumId)
+                _albumWithTracks.value = albumWithTracks ?: return@launch
+            }
         }
     }
 

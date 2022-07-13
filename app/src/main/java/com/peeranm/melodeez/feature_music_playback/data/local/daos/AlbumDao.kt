@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
 interface AlbumDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAlbum(album: Album)
+    suspend fun insertAlbum(album: Album): Long
 
     @Delete
-    suspend fun deleteAlbum(album: Album)
+    suspend fun deleteAlbum(album: Album): Int
 
     @Query("delete from albums")
-    suspend fun deleteAlbums()
+    suspend fun deleteAlbums(): Int
 
     @Query("select * from albums")
     fun getAlbumsAsFlow(): Flow<List<Album>>
@@ -25,6 +25,6 @@ interface AlbumDao {
 
     @Transaction
     @Query("select * from albums where albumId =:albumId")
-    suspend fun getAlbumWithTracks(albumId: Long): AlbumWithTracks
+    suspend fun getAlbumWithTracks(albumId: Long): AlbumWithTracks?
 
 }

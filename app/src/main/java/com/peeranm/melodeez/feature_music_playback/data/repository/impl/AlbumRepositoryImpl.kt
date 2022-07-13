@@ -8,16 +8,16 @@ import kotlinx.coroutines.flow.Flow
 
 class AlbumRepositoryImpl(private val albumDao: AlbumDao) : AlbumRepository {
 
-    override suspend fun insertAlbum(album: Album) {
-        albumDao.insertAlbum(album)
+    override suspend fun insertAlbum(album: Album): Long {
+        return albumDao.insertAlbum(album)
     }
 
-    override suspend fun deleteAlbum(album: Album) {
-        albumDao.deleteAlbum(album)
+    override suspend fun deleteAlbum(album: Album): Int {
+        return albumDao.deleteAlbum(album)
     }
 
-    override suspend fun deleteAlbums() {
-        albumDao.deleteAlbums()
+    override suspend fun deleteAlbums(): Int {
+        return albumDao.deleteAlbums()
     }
 
     override fun getAlbumsAsFlow(): Flow<List<Album>> {
@@ -28,7 +28,7 @@ class AlbumRepositoryImpl(private val albumDao: AlbumDao) : AlbumRepository {
         return albumDao.getAlbums()
     }
 
-    override suspend fun getAlbumWithTracks(albumId: Long): AlbumWithTracks {
+    override suspend fun getAlbumWithTracks(albumId: Long): AlbumWithTracks? {
         return albumDao.getAlbumWithTracks(albumId)
     }
 }
