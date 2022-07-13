@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class GetPlaylistWithTracksUseCase(private val repository: PlaylistRepository) {
-    suspend operator fun invoke(playlistId: Long): PlaylistWithTracks = withContext(Dispatchers.IO) {
+    suspend operator fun invoke(playlistId: Long): PlaylistWithTracks? = withContext(Dispatchers.IO) {
         repository.getPlaylistWithTracks(playlistId)
     }
 }

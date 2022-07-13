@@ -55,23 +55,23 @@ class PlaylistRepositoryImpl(private val database: MusicDatabase) : PlaylistRepo
                 val crossRef = PlaylistTrackCrossRef(playlistId, trackId)
                 database.playlistDao().deleteTrackFromPlaylist(crossRef)
 
-                // name is the primary key belonging to the playlist
+                // update playlist with track count - 1
                 val playlist = database.playlistDao().getPlaylist(crossRef.playlistId)
-
-                // update playlist with decreased track count
-                playlist?.let {
-                    val noOfTracks = database.playlistDao().getPlaylistWithTracks(playlistId).tracks.size
-                    database.playlistDao().insertPlaylist(playlist.copy(noOfTracks = noOfTracks))
+                val playlistWithTracks = database.playlistDao().getPlaylistWithTracks(playlistId)
+                if (playlist != null && playlistWithTracks != null) {
+                    database.playlistDao().insertPlaylist(
+                        playlist.copy(noOfTracks = playlistWithTracks.tracks.size)
+                    )
                 }
             }
         }
     }
 
-    override suspend fun deleteTracksFromPlaylist(playlistId: Long) {
-        database.playlistDao().deleteAllTracksFromPlaylist(playlistId)
+    override suspend fun deleteTracksFromPlaylist(playlistId: Long): Int {
+        return database.playlistDao().deleteAllTracksFromPlaylist(playlistId)
     }
 
-    override suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks {
+    override suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks? {
         return database.playlistDao().getPlaylistWithTracks(playlistId)
     }
 
@@ -92,13 +92,13 @@ class PlaylistRepositoryImpl(private val database: MusicDatabase) : PlaylistRepo
                 }
                 // Update no of tracks after inserting them to playlist
                 val playlist = database.playlistDao().getPlaylist(playlistId)
-                playlist?.let {
-                    val noOfTracks = database.playlistDao().getPlaylistWithTracks(playlistId).tracks.size
+                val playlistWithTracks = database.playlistDao().getPlaylistWithTracks(playlistId)
+                if (playlist != null && playlistWithTracks != null) {
                     database.playlistDao().insertPlaylist(
                         playlist.copy(
                             playlistId = playlist.playlistId,
                             name = playlist.name,
-                            noOfTracks = noOfTracks
+                            noOfTracks = playlistWithTracks.tracks.size
                         )
                     )
                 }

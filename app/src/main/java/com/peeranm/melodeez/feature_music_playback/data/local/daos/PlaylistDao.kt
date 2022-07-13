@@ -16,7 +16,7 @@ interface PlaylistDao {
     suspend fun deletePlaylist(playlistId: Long): Int
 
     @Query("delete from playlists")
-    suspend fun deleteAllPlaylists()
+    suspend fun deleteAllPlaylists(): Int
 
     @Query("select * from playlists where playlistId =:playlistId")
     suspend fun getPlaylist(playlistId: Long): Playlist?
@@ -39,10 +39,10 @@ interface PlaylistDao {
     suspend fun deleteTrackFromPlaylist(crossRef: PlaylistTrackCrossRef)
 
     @Query("delete from playlist_track_junction where playlistId =:playlistId")
-    suspend fun deleteAllTracksFromPlaylist(playlistId: Long)
+    suspend fun deleteAllTracksFromPlaylist(playlistId: Long): Int
 
     @Transaction
     @Query("select * from playlists where playlistId =:playlistId")
-    suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks
+    suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks?
 
 }

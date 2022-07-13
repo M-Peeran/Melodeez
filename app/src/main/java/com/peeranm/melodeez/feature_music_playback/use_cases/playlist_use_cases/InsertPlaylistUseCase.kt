@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class InsertPlaylistUseCase(private val repository: PlaylistRepository) {
-    suspend operator fun invoke(playlistName: String) = withContext(Dispatchers.IO) {
+    suspend operator fun invoke(playlistName: String): Long = withContext(Dispatchers.IO) {
         repository.insertPlaylist(Playlist(name = playlistName))
     }
 }
