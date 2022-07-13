@@ -64,22 +64,20 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
 
         adapter = SimpleTrackAdapter(requireContext(), this@PlaylistDetailsFragment)
 
-        collectWithLifecycle(viewModel.playlistWithTracks) {
-            it?.let {
-                val (playlist, tracks) = it
-                binding.apply {
-                    listTracksInPlaylist.adapter = adapter
-                    val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-                    binding.listTracksInPlaylist.layoutManager = layoutManager
-                    binding.listTracksInPlaylist.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
-                    textPlaylistName.text = playlist.name
-                    textNoOfTracks.text = String.format(
-                        getString(R.string.no_of_tracks),
-                        playlist.noOfTracks
-                    )
-                    imageAlbumArt.setImageResource(R.drawable.ic_playlist)
-                    adapter?.submitData(tracks)
-                }
+        collectWithLifecycle(viewModel.playlistWithTracks) { playlistWithTracks ->
+            val (playlist, tracks) = playlistWithTracks
+            binding.apply {
+                listTracksInPlaylist.adapter = adapter
+                val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                binding.listTracksInPlaylist.layoutManager = layoutManager
+                binding.listTracksInPlaylist.addItemDecoration(DividerItemDecoration(requireContext(), layoutManager.orientation))
+                textPlaylistName.text = playlist.name
+                textNoOfTracks.text = String.format(
+                    getString(R.string.no_of_tracks),
+                    playlist.noOfTracks
+                )
+                imageAlbumArt.setImageResource(R.drawable.ic_playlist)
+                adapter?.submitData(tracks)
             }
         }
 
@@ -88,6 +86,10 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
                 showToast("Deleted successfully!")
                 findNavController().navigateUp()
             }
+        }
+
+        collectWithLifecycle(viewModel.message) { message ->
+            if (message.isNotEmpty()) showToast(message)
         }
     }
 
