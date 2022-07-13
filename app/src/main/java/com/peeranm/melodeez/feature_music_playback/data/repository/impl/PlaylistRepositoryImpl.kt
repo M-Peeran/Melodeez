@@ -67,10 +67,6 @@ class PlaylistRepositoryImpl(private val database: MusicDatabase) : PlaylistRepo
         }
     }
 
-    override suspend fun deleteTracksFromPlaylist(playlistId: Long): Int {
-        return database.playlistDao().deleteAllTracksFromPlaylist(playlistId)
-    }
-
     override suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks? {
         return database.playlistDao().getPlaylistWithTracks(playlistId)
     }
