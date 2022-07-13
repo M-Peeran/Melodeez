@@ -21,7 +21,6 @@ import com.peeranm.melodeez.core.collectLatestWithLifecycle
 import com.peeranm.melodeez.core.showToast
 import com.peeranm.melodeez.databinding.AllTracksFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Track
-import com.peeranm.melodeez.feature_music_playback.presentation.Event
 import com.peeranm.melodeez.feature_music_playback.presentation.ViewPagerHostFragmentDirections
 import com.peeranm.melodeez.feature_music_playback.presentation.all_tracks.details.TrackDetailsDialog
 import com.peeranm.melodeez.feature_music_playback.utils.adapters.OnItemClickListener
@@ -102,7 +101,7 @@ class AllTracksFragment : Fragment(), OnItemClickListener<Track> {
         if (permission == PackageManager.PERMISSION_GRANTED) {
             isPermissionGranted = true
             toggleProgressBarVisibility()
-            viewModel.onEvent(Event.Synchronize)
+            viewModel.synchronizeTracks()
         }
     }
 
@@ -118,7 +117,7 @@ class AllTracksFragment : Fragment(), OnItemClickListener<Track> {
             ) { isGranted ->
                 if (isGranted) {
                     toggleProgressBarVisibility(showNow = true)
-                    viewModel.onEvent(Event.Synchronize)
+                    viewModel.synchronizeTracks()
                 } else {
                     toggleProgressBarVisibility()
                     showToast("Permission Denied")
