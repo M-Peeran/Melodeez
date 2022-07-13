@@ -79,6 +79,10 @@ class PlaylistRepositoryImpl(private val database: MusicDatabase) : PlaylistRepo
         return database.playlistDao().getPlaylistsAsFlow()
     }
 
+    override fun getPlaylistWithTracksAsFlow(playlistId: Long): Flow<PlaylistWithTracks?> {
+        return database.playlistDao().getPlaylistWithTracksAsFlow(playlistId)
+    }
+
     override suspend fun insertTracksToPlaylist(tracksIds: List<Long>, playlistId: Long) {
         withContext(Dispatchers.IO) {
             database.withTransaction {

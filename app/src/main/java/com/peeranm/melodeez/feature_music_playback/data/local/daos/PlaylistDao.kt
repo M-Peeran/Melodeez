@@ -27,6 +27,10 @@ interface PlaylistDao {
     @Query("select * from playlists")
     fun getPlaylistsAsFlow(): Flow<List<Playlist>>
 
+    @Transaction
+    @Query("select * from playlists where playlistId =:playlistId")
+    fun getPlaylistWithTracksAsFlow(playlistId: Long): Flow<PlaylistWithTracks?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrackToPlaylist(crossRef: PlaylistTrackCrossRef)
 
@@ -41,6 +45,4 @@ interface PlaylistDao {
     @Query("select * from playlists where playlistId =:playlistId")
     suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTracks
 
-    @Query("select playlistId from playlists order by playlistId desc limit 1")
-    suspend fun getLastCreatedPlaylistId(): Long?
 }

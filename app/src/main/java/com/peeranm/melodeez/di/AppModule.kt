@@ -98,7 +98,8 @@ object AppModule {
             insertTrackToPlaylist = InsertTrackToPlaylistUseCase(playlistRepository),
             insertTracksToPlaylist = InsertTracksToPlaylistUseCase(playlistRepository),
             deleteTrackFromPlaylist = DeleteTrackFromPlaylistUseCase(playlistRepository),
-            getPlaylistWithTracks = GetPlaylistWithTracksUseCase(playlistRepository)
+            getPlaylistWithTracks = GetPlaylistWithTracksUseCase(playlistRepository),
+            getPlaylistWithTracksForUi = GetPlaylistWithTracksForUiUseCase(playlistRepository)
         )
     }
 

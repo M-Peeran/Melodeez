@@ -89,8 +89,6 @@ class PlaylistDetailsFragment : Fragment(), OnItemClickListener<Track> {
                 findNavController().navigateUp()
             }
         }
-
-        viewModel.onEvent(Event.GetPlaylistWithTracks(args.playlistId))
     }
 
     override fun onItemClick(view: View?, data: Track, position: Int) {
