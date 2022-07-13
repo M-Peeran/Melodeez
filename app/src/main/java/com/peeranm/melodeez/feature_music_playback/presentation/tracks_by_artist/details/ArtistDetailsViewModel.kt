@@ -22,14 +22,18 @@ class ArtistDetailsViewModel @Inject constructor(
     private val _artistWithTracks = MutableStateFlow(getDummyArtistWithTracks())
     val artistWithTracks = _artistWithTracks.asStateFlow()
 
+    private val _message = MutableStateFlow("")
+    val message = _message.asStateFlow()
+
     init {
         val artistId = savedStateHandle.get<Long>(ARG_ARTIST_ID)
         if (artistId != null) {
             viewModelScope.launch {
                 val artistWithTracks = artistUseCases.getArtistWithTracks(artistId)
-                _artistWithTracks.value = artistWithTracks ?: return@launch
+                if (artistWithTracks != null) _artistWithTracks.value = artistWithTracks
+                else _message.value = "The Artist you are looking for is not found!"
             }
-        }
+        } else _message.value = "ArtistId is null!"
     }
 
     private fun getDummyArtistWithTracks() = ArtistWithTracks(Artist(name = ""), emptyList())

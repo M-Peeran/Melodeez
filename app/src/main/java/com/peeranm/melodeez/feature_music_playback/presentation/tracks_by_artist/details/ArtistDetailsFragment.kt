@@ -12,10 +12,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.peeranm.melodeez.R
-import com.peeranm.melodeez.core.KIND_ARTIST
-import com.peeranm.melodeez.core.MEDIA_KEY
-import com.peeranm.melodeez.core.MEDIA_POSITION
-import com.peeranm.melodeez.core.collectWithLifecycle
+import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.databinding.ArtistDetailsFragmentBinding
 import com.peeranm.melodeez.feature_music_playback.model.Artist
 import com.peeranm.melodeez.feature_music_playback.model.Track
@@ -61,6 +58,10 @@ class ArtistDetailsFragment : Fragment(), OnItemClickListener<Track> {
 
         collectWithLifecycle(viewModel.artistWithTracks) {
             binding.bindArtistAndTracks(it.artist, it.tracks)
+        }
+
+        collectWithLifecycle(viewModel.message) { message ->
+            if (message.isNotEmpty()) showToast(message)
         }
 
     }
