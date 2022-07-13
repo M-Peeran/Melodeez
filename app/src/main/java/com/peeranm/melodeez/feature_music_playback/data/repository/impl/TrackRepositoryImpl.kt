@@ -7,15 +7,15 @@ import kotlinx.coroutines.flow.Flow
 
 class TrackRepositoryImpl(private val trackDao: TrackDao, ) : TrackRepository {
 
-    override suspend fun insert(track: Track) {
-        trackDao.insertTrack(track)
+    override suspend fun insert(track: Track): Long {
+        return trackDao.insertTrack(track)
     }
 
-    override suspend fun deleteTrack(trackId: Long) {
-        trackDao.deleteTrack(trackId)
+    override suspend fun deleteTrack(trackId: Long): Int {
+        return trackDao.deleteTrack(trackId)
     }
 
-    override suspend fun getTrack(trackId: Long): Track {
+    override suspend fun getTrack(trackId: Long): Track? {
         return trackDao.getTrack(trackId)
     }
 
@@ -27,7 +27,7 @@ class TrackRepositoryImpl(private val trackDao: TrackDao, ) : TrackRepository {
        return trackDao.getTracksAsFlow()
     }
 
-    override suspend fun deleteTracks() {
-        trackDao.deleteTracks()
+    override suspend fun deleteTracks(): Int {
+        return trackDao.deleteTracks()
     }
 }

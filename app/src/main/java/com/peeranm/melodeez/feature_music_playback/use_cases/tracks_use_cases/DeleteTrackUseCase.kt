@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class DeleteTrackUseCase(private val repository: TrackRepository) {
-    suspend operator fun invoke(trackId: Long) = withContext(Dispatchers.IO)  {
+    suspend operator fun invoke(trackId: Long): Int = withContext(Dispatchers.IO)  {
         repository.deleteTrack(trackId)
     }
 }

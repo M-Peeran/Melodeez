@@ -6,15 +6,15 @@ import kotlinx.coroutines.flow.Flow
 
 interface TrackRepository {
 
-    suspend fun insert(track: Track)
+    suspend fun insert(track: Track): Long
 
-    suspend fun deleteTrack(trackId: Long)
+    suspend fun deleteTrack(trackId: Long): Int
 
-    suspend fun getTrack(trackId: Long): Track
+    suspend fun getTrack(trackId: Long): Track?
 
     fun getTracksAsFlow(): Flow<List<Track>>
 
     suspend fun getTracks(): List<Track>
 
-    suspend fun deleteTracks()
+    suspend fun deleteTracks(): Int
 }

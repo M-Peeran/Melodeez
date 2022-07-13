@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.Flow
 interface TrackDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTrack(track: Track)
+    suspend fun insertTrack(track: Track): Long
 
     @Query("delete from tracks where trackId =:trackId")
-    suspend fun deleteTrack(trackId: Long)
+    suspend fun deleteTrack(trackId: Long): Int
 
     @Query("select * from tracks where uri =:trackId")
-    suspend fun getTrack(trackId: Long): Track
+    suspend fun getTrack(trackId: Long): Track?
 
     @Query("select * from tracks")
     suspend fun getTracks(): List<Track>
@@ -23,6 +23,6 @@ interface TrackDao {
     fun getTracksAsFlow(): Flow<List<Track>>
 
     @Query("delete from tracks")
-    suspend fun deleteTracks()
+    suspend fun deleteTracks(): Int
 
 }
