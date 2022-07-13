@@ -17,13 +17,9 @@ class ArtistsViewModel @Inject constructor(
     val artists: StateFlow<List<Artist>>
     get() = artistUseCases.getArtistsForUi().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun setStateEvent(event: Event) {
-        when (event) {
-            Event.Synchronize -> {
-                viewModelScope.launch {
-                    artistUseCases.synchronizeArtists()
-                }
-            }
+    fun synchronizeArtists() {
+        viewModelScope.launch {
+            artistUseCases.synchronizeArtists()
         }
     }
 }
