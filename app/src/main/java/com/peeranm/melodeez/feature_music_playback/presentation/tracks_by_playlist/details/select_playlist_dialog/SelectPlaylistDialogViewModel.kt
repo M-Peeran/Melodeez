@@ -18,16 +18,15 @@ class SelectPlaylistDialogViewModel @Inject constructor(
     private val _playlists = MutableStateFlow<List<Playlist>?>(null)
     val playlists: StateFlow<List<Playlist>?> = _playlists
 
-    fun onEvent(event: Event) {
-        when (event) {
-            is Event.GetPlaylists -> viewModelScope.launch {
-                _playlists.value = playlistUseCases.getPlaylists()
-            }
+    fun getPlaylists() {
+        viewModelScope.launch {
+            _playlists.value = playlistUseCases.getPlaylists()
+        }
+    }
 
-            is Event.InsertTrackToPlaylist -> viewModelScope.launch {
-                playlistUseCases.insertTrackToPlaylist(event.playlistId, event.trackId)
-            }
-
+    fun insertTrackToPlaylist(trackId: Long, playlistId: Long) {
+        viewModelScope.launch {
+            playlistUseCases.insertTrackToPlaylist(playlistId, trackId)
         }
     }
 }
