@@ -29,16 +29,6 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
-        <receiver android:name=".feature_music_playback.utils.ButtonReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="ACTION_PLAY" />
-                <action android:name="ACTION_PAUSE" />
-                <action android:name="ACTION_PLAY_NEXT" />
-                <action android:name="ACTION_PLAY_PREVIOUS" />
-                <action android:name="ACTION_STOP" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

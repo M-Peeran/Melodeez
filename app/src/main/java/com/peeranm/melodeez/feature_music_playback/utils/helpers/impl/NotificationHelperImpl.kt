@@ -3,6 +3,7 @@ package com.peeranm.melodeez.feature_music_playback.utils.helpers.impl
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -19,7 +20,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.peeranm.melodeez.R
 import com.peeranm.melodeez.core.*
 import com.peeranm.melodeez.feature_music_playback.presentation.MainActivity
-import com.peeranm.melodeez.feature_music_playback.utils.ButtonReceiver
 import com.peeranm.melodeez.feature_music_playback.utils.NotificationActionListener
 import com.peeranm.melodeez.feature_music_playback.utils.helpers.NotificationHelper
 import java.io.File
@@ -36,7 +36,7 @@ class NotificationHelperImpl(private val context: Context) : NotificationHelper 
         this.listener = listener
     }
 
-    private val buttonReceiver = object: ButtonReceiver() {
+    private val buttonReceiver = object: BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent != null) {
                 listener?.onReceive(intent.action)
